@@ -1,15 +1,15 @@
 export const COLORS = {
-  // Brand / Primary
-  primary: '#6366F1', // Indigo
-  primaryDark: '#4F46E5',
-  primaryLight: '#818CF8',
+  // Brand / Primary Palette (User Theme)
+  primary: '#5588ff',      // (85,136,255)
+  primaryDark: '#3366ff',  // (51,102,255)
+  primaryLight: '#77aaff', // (119,170,255)
 
-  // Accent Colors
-  gold: '#F59E0B',
+  // Accent Colors & Highlights
+  gold: '#99ccff',         // (153,204,255) Accent Highlight
+  sky: '#bbeeff',          // (187,238,255) Soft Ice Highlight
   emerald: '#10B981',
   crimson: '#EF4444',
-  purple: '#8B5CF6',
-  sky: '#0284C7',
+  purple: '#77aaff',
 
   // Dark Theme Surfaces
   background: '#0F172A', // Slate 900
@@ -46,14 +46,14 @@ export const RADIUS = {
 };
 
 export const PLAYER_COLORS = [
-  '#EF4444', // Red
-  '#3B82F6', // Blue
-  '#10B981', // Green
-  '#F59E0B', // Yellow
-  '#8B5CF6', // Purple
-  '#EC4899', // Pink
-  '#06B6D4', // Cyan
+  '#5588ff', // Royal Blue (85,136,255)
+  '#77aaff', // Light Blue (119,170,255)
+  '#99ccff', // Sky Blue (153,204,255)
+  '#bbeeff', // Ice Blue (187,238,255)
+  '#3366ff', // Deep Blue (51,102,255)
+  '#10B981', // Emerald
   '#F97316', // Orange
+  '#EF4444', // Crimson
 ];
 
 export const PLAYER_AVATARS = [
