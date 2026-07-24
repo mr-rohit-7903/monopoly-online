@@ -299,7 +299,7 @@ export default function PropertiesScreen() {
               <ImageBackground
                 source={textureSource}
                 style={styles.deedCardBg}
-                imageStyle={{ opacity: 0.18 }}
+                imageStyle={{ opacity: 0.23 }}
               >
                 {/* Header */}
                 <View style={styles.deedHeader}>

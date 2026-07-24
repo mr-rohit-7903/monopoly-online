@@ -216,7 +216,7 @@ export function TradeModal({
                             <ImageBackground
                               source={textureSource}
                               style={styles.chipTextureBg}
-                              imageStyle={{ borderRadius: RADIUS.sm, opacity: 0.3 }}
+                              imageStyle={{ borderRadius: RADIUS.sm, opacity: 0.35 }}
                             >
                               <Text style={[styles.deedChipText, { color: colors.textPrimary }]}>
                                 {isChecked ? '[SELECTED] ' : ''}{deed.name} (${deed.purchasePrice})
@@ -267,7 +267,7 @@ export function TradeModal({
                             <ImageBackground
                               source={textureSource}
                               style={styles.chipTextureBg}
-                              imageStyle={{ borderRadius: RADIUS.sm, opacity: 0.3 }}
+                              imageStyle={{ borderRadius: RADIUS.sm, opacity: 0.35 }}
                             >
                               <Text style={[styles.deedChipText, { color: colors.textPrimary }]}>
                                 {isChecked ? '[SELECTED] ' : ''}{deed.name} (${deed.purchasePrice})

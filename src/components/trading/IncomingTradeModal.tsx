@@ -106,7 +106,7 @@ export function IncomingTradeModal({
                         <ImageBackground
                           source={textureSource}
                           style={styles.pillTextureBg}
-                          imageStyle={{ borderRadius: RADIUS.sm, opacity: 0.3 }}
+                          imageStyle={{ borderRadius: RADIUS.sm, opacity: 0.35 }}
                         >
                           <Text style={[styles.deedName, { color: colors.textPrimary }]}>{deed.name}</Text>
                           <Text style={[styles.deedValue, { color: colors.textSecondary }]}>${deed.purchasePrice}</Text>
@@ -139,7 +139,7 @@ export function IncomingTradeModal({
                         <ImageBackground
                           source={textureSource}
                           style={styles.pillTextureBg}
-                          imageStyle={{ borderRadius: RADIUS.sm, opacity: 0.3 }}
+                          imageStyle={{ borderRadius: RADIUS.sm, opacity: 0.35 }}
                         >
                           <Text style={[styles.deedName, { color: colors.textPrimary }]}>{deed.name}</Text>
                           <Text style={[styles.deedValue, { color: colors.textSecondary }]}>${deed.purchasePrice}</Text>
