@@ -335,8 +335,20 @@ export default function PropertiesScreen() {
                   <View style={[styles.groupBanner, { backgroundColor: groupColor }]}>
                     <Text style={styles.groupBannerText}>{deed.group.toUpperCase()}</Text>
                     {owner ? (
-                      <View style={[styles.bannerOwnerBadge, { backgroundColor: isMyProperty ? 'rgba(16, 185, 129, 0.3)' : 'rgba(0, 0, 0, 0.4)' }]}>
-                        <Text style={styles.bannerOwnerText}>{isMyProperty ? 'YOU OWN THIS' : `OWNER: ${owner.name.toUpperCase()}`}</Text>
+                      <View style={styles.bannerBadgeGroup}>
+                        {hasHotel ? (
+                          <View style={[styles.buildingBadge, { backgroundColor: 'rgba(234, 179, 8, 0.3)', borderColor: colors.gold }]}>
+                            <Text style={[styles.buildingBadgeText, { color: colors.gold }]}>HOTEL</Text>
+                          </View>
+                        ) : houseCount > 0 ? (
+                          <View style={[styles.buildingBadge, { backgroundColor: 'rgba(16, 185, 129, 0.3)', borderColor: colors.emerald }]}>
+                            <Text style={[styles.buildingBadgeText, { color: colors.emerald }]}>{houseCount} HOUSE{houseCount > 1 ? 'S' : ''}</Text>
+                          </View>
+                        ) : null}
+
+                        <View style={[styles.bannerOwnerBadge, { backgroundColor: isMyProperty ? 'rgba(16, 185, 129, 0.3)' : 'rgba(0, 0, 0, 0.4)' }]}>
+                          <Text style={styles.bannerOwnerText}>{isMyProperty ? 'YOU OWN THIS' : `OWNER: ${owner.name.toUpperCase()}`}</Text>
+                        </View>
                       </View>
                     ) : (
                       <View style={styles.bannerForSaleBadge}>
@@ -888,6 +900,21 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '900',
     letterSpacing: 1,
+  },
+  bannerBadgeGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  buildingBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: RADIUS.sm,
+    borderWidth: 1,
+  },
+  buildingBadgeText: {
+    fontSize: 9,
+    fontWeight: '900',
   },
   bannerOwnerBadge: {
     paddingHorizontal: 8,
