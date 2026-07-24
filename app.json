@@ -2,7 +2,7 @@
   "expo": {
     "name": "Monopoly Banking",
     "slug": "monopoly-banking",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "icon": "./assets/icon.png",
@@ -21,7 +21,16 @@
       "bundler": "metro"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableSeparateBuildPerCPUArchitecture": true,
+            "enableProguardInReleaseBuilds": true
+          }
+        }
+      ]
     ],
     "scheme": "monopoly-banking"
   }

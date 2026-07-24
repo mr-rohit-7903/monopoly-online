@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  StyleSheet, Text, View, ScrollView,
+  StyleSheet, Text, View, ScrollView, FlatList,
   TextInput, Pressable, ActivityIndicator,
 } from 'react-native';
 import { COLORS, RADIUS, SPACING } from '../../src/constants/theme';
@@ -147,13 +147,13 @@ export default function HistoryLogsScreen() {
       </View>
 
       {/* History Log Items List */}
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {loading ? (
-          <View style={styles.emptyContainer}>
-            <ActivityIndicator color={colors.primary} size="large" />
-            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Syncing live history logs...</Text>
-          </View>
-        ) : filteredLogs.length === 0 ? (
+      {loading ? (
+        <View style={styles.emptyContainer}>
+          <ActivityIndicator color={colors.primary} size="large" />
+          <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Syncing live history logs...</Text>
+        </View>
+      ) : filteredLogs.length === 0 ? (
+        <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.emptyContainer}>
             <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>
               {searchQuery.length > 0 ? 'No Matching Logs Found' : 'No History Logs Recorded Yet'}
@@ -170,12 +170,19 @@ export default function HistoryLogsScreen() {
               </Pressable>
             )}
           </View>
-        ) : (
-          filteredLogs.map((log) => (
-            <HistoryLogCard key={log.id} item={log} />
-          ))
-        )}
-      </ScrollView>
+        </ScrollView>
+      ) : (
+        <FlatList
+          data={filteredLogs}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <HistoryLogCard item={item} />}
+          contentContainerStyle={styles.scrollContent}
+          initialNumToRender={15}
+          maxToRenderPerBatch={10}
+          windowSize={10}
+          removeClippedSubviews={true}
+        />
+      )}
     </View>
   );
 }
