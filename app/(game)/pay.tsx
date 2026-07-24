@@ -51,7 +51,10 @@ export default function PayTerminalScreen() {
     }
 
     if (numAmount > currentPlayer.balance) {
-      Alert.alert('Insufficient Balance', `You have $${currentPlayer.balance.toLocaleString()} available.`);
+      Alert.alert(
+        'Insufficient Balance!',
+        `You have $${currentPlayer.balance.toLocaleString()} available in your account, but need $${numAmount.toLocaleString()}.`
+      );
       return;
     }
 

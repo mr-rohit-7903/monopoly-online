@@ -45,6 +45,16 @@ export const CardDrawerModal: React.FC<CardDrawerModalProps> = ({
   const handleExecuteCard = async () => {
     if (!selectedCard) return;
 
+    if (selectedCard.action === 'pay_bank' && selectedCard.amount) {
+      if (currentPlayer.balance < selectedCard.amount) {
+        Alert.alert(
+          'Insufficient Balance!',
+          `You have $${currentPlayer.balance.toLocaleString()} available but need $${selectedCard.amount.toLocaleString()} to pay for card "${selectedCard.title}".`
+        );
+        return;
+      }
+    }
+
     setLoading(true);
     try {
       if (selectedCard.action === 'pay_bank' && selectedCard.amount) {
@@ -82,7 +92,11 @@ export const CardDrawerModal: React.FC<CardDrawerModalProps> = ({
       onClose();
     } catch (err: any) {
       setLoading(false);
-      Alert.alert('Card Error', err?.message || 'Could not execute card effect.');
+      const isInsuff = err?.message?.toLowerCase().includes('insufficient');
+      Alert.alert(
+        isInsuff ? 'Insufficient Balance!' : 'Card Error',
+        err?.message || 'Could not execute card effect.'
+      );
     }
   };
 

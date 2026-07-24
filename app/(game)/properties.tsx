@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   StyleSheet, Text, View, ScrollView,
-  Pressable, Platform, ActivityIndicator, Modal, ImageBackground,
+  Pressable, Platform, ActivityIndicator, Modal, ImageBackground, Alert,
 } from 'react-native';
 import { BOARD_PROPERTIES, GROUP_COLORS } from '../../src/constants/boardRegistry';
 import { COLORS, RADIUS, SPACING } from '../../src/constants/theme';
@@ -131,6 +131,14 @@ export default function PropertiesScreen() {
       icon = '[RENT]';
     }
 
+    if (!isPayout && currentPlayer.balance < amount) {
+      Alert.alert(
+        'Insufficient Balance!',
+        `You have $${currentPlayer.balance.toLocaleString()} available in your account, but need $${amount.toLocaleString()} for this transaction.`
+      );
+      return;
+    }
+
     setActiveModal({
       type,
       deed,
@@ -146,7 +154,16 @@ export default function PropertiesScreen() {
   // Execute modal action
   const handleConfirmAction = async () => {
     if (!activeModal) return;
-    const { type, deed, pState, amount } = activeModal;
+    const { type, deed, pState, amount, isPayout } = activeModal;
+
+    if (!isPayout && currentPlayer.balance < amount) {
+      setModalLoading(false);
+      Alert.alert(
+        'Insufficient Balance!',
+        `You have $${currentPlayer.balance.toLocaleString()} available in your account, but need $${amount.toLocaleString()} for this transaction.`
+      );
+      return;
+    }
 
     setModalLoading(true);
     setModalError(null);
@@ -194,6 +211,10 @@ export default function PropertiesScreen() {
 
       setActiveModal(null);
     } catch (err: any) {
+      const isInsuff = err?.message?.toLowerCase().includes('insufficient');
+      if (isInsuff) {
+        Alert.alert('Insufficient Balance!', err?.message || 'You do not have enough funds.');
+      }
       setModalError(err?.message || 'Transaction failed. Please try again.');
     } finally {
       setModalLoading(false);

@@ -53,6 +53,10 @@ export function IncomingTradeModal({
       onClose();
       Alert.alert('Trade Accepted!', `Assets and cash have been exchanged with ${trade.senderName}!`);
     } catch (err: any) {
+      const isInsuff = err?.message?.toLowerCase().includes('insufficient');
+      if (isInsuff) {
+        Alert.alert('Insufficient Balance!', err?.message || 'You do not have enough funds to accept this trade.');
+      }
       setErrorMsg(err?.message || 'Failed to accept trade proposal.');
     } finally {
       setLoading(false);

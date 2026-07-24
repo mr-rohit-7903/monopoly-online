@@ -92,6 +92,10 @@ export function TradeModal({
     const numRequestCash = parseInt(requestCash.replace(/[^0-9]/g, ''), 10) || 0;
 
     if (numOfferCash > currentPlayer.balance) {
+      Alert.alert(
+        'Insufficient Balance!',
+        `You offered $${numOfferCash.toLocaleString()} cash in trade, but your balance is only $${currentPlayer.balance.toLocaleString()}.`
+      );
       setErrorMsg(`You offered $${numOfferCash.toLocaleString()} but only have $${currentPlayer.balance.toLocaleString()}.`);
       return;
     }
