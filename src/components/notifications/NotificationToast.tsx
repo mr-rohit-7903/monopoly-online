@@ -9,9 +9,11 @@ import Animated, {
 import { useNotificationStore } from '../../store/useNotificationStore';
 import { COLORS, RADIUS, SPACING } from '../../constants/theme';
 import { soundEngine } from '../../services/sound/soundService';
+import { useThemeStore } from '../../store/useThemeStore';
 
 export const NotificationToast: React.FC = () => {
   const { activeToast, hideToast } = useNotificationStore();
+  const { colors } = useThemeStore();
   const translateY = useSharedValue(-120);
   const opacity = useSharedValue(0);
 
@@ -44,11 +46,16 @@ export const NotificationToast: React.FC = () => {
 
   return (
     <Animated.View style={[styles.container, animatedStyle]}>
-      <Pressable style={styles.toastCard} onPress={hideToast}>
-        {activeToast.icon ? <Text style={styles.icon}>[{activeToast.icon}]</Text> : null}
+      <Pressable
+        style={[
+          styles.toastCard,
+          { backgroundColor: colors.surface, borderColor: colors.gold },
+        ]}
+        onPress={hideToast}
+      >
         <View style={styles.content}>
           <Text style={styles.title}>{activeToast.title}</Text>
-          <Text style={styles.message} numberOfLines={2}>
+          <Text style={[styles.message, { color: colors.textPrimary }]} numberOfLines={2}>
             {activeToast.message}
           </Text>
         </View>
@@ -68,30 +75,30 @@ const styles = StyleSheet.create({
   toastCard: {
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
-    padding: SPACING.md,
-    flexDirection: 'row',
-    alignItems: 'center',
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
     borderWidth: 2,
     borderColor: COLORS.gold,
     elevation: 8,
-    gap: SPACING.md,
-  },
-  icon: {
-    fontSize: 26,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
   },
   content: {
-    flex: 1,
+    width: '100%',
   },
   title: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '800',
     color: COLORS.gold,
     textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   message: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
     color: COLORS.textPrimary,
-    marginTop: 2,
+    marginTop: 3,
   },
 });
