@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import {
   StyleSheet, Text, View, ScrollView,
-  Pressable, Platform, ActivityIndicator, Modal, ImageBackground,
+  Pressable, Platform, ActivityIndicator, Modal, ImageBackground, Image,
 } from 'react-native';
 import { BOARD_PROPERTIES, GROUP_COLORS } from '../../src/constants/boardRegistry';
 import { COLORS, RADIUS, SPACING } from '../../src/constants/theme';
-import { getTextureForGroup } from '../../src/constants/textures';
+import { getTextureForGroup, getPropertyImage } from '../../src/constants/textures';
 import { Button } from '../../src/components/ui/Button';
 import { useAuthStore } from '../../src/store/useAuthStore';
 import { useGameStore } from '../../src/store/useGameStore';
@@ -284,6 +284,7 @@ export default function PropertiesScreen() {
             : null;
 
           const textureSource = getTextureForGroup(deed.group);
+          const propImg = getPropertyImage(deed.id);
 
           return (
             <View
@@ -321,6 +322,13 @@ export default function PropertiesScreen() {
                     </View>
                   )}
                 </View>
+
+                {/* Transport Image Illustration */}
+                {propImg && (
+                  <View style={styles.transportImgContainer}>
+                    <Image source={propImg} style={styles.transportImg} resizeMode="contain" />
+                  </View>
+                )}
 
               {/* Price / Mortgage / Rent Row */}
               <View style={styles.infoRow}>
@@ -719,6 +727,19 @@ const styles = StyleSheet.create({
   deedCardBg: {
     flex: 1,
     padding: SPACING.md,
+  },
+  transportImgContainer: {
+    height: 100,
+    marginVertical: SPACING.xs,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: RADIUS.sm,
+    backgroundColor: 'rgba(0,0,0,0.15)',
+    overflow: 'hidden',
+  },
+  transportImg: {
+    width: '100%',
+    height: '100%',
   },
   ownerBadge: {
     flexDirection: 'row',
