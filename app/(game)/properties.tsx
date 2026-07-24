@@ -295,12 +295,13 @@ export default function PropertiesScreen() {
                 isOwnedByOther && pState.isMortgaged && styles.mortgagedCard,
               ]}
             >
-              {/* Header with Ticket Texture Background */}
+              {/* Texture covers the ENTIRE card */}
               <ImageBackground
                 source={textureSource}
-                style={styles.deedHeaderBg}
-                imageStyle={{ borderRadius: RADIUS.sm, opacity: 0.28 }}
+                style={styles.deedCardBg}
+                imageStyle={{ opacity: 0.18 }}
               >
+                {/* Header */}
                 <View style={styles.deedHeader}>
                   <View style={styles.titleCol}>
                     <View style={[styles.groupPill, { backgroundColor: groupColor }]}>
@@ -320,7 +321,6 @@ export default function PropertiesScreen() {
                     </View>
                   )}
                 </View>
-              </ImageBackground>
 
               {/* Price / Mortgage / Rent Row */}
               <View style={styles.infoRow}>
@@ -488,6 +488,7 @@ export default function PropertiesScreen() {
                   </View>
                 )}
               </View>
+              </ImageBackground>
             </View>
           );
         })}
@@ -676,7 +677,8 @@ const styles = StyleSheet.create({
   deedCard: {
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.md,
-    padding: SPACING.md,
+    padding: 0,
+    overflow: 'hidden',
     borderLeftWidth: 5,
     borderWidth: 1,
     borderColor: COLORS.surfaceBorder,
@@ -714,10 +716,9 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: COLORS.textPrimary,
   },
-  deedHeaderBg: {
-    borderRadius: RADIUS.sm,
-    overflow: 'hidden',
-    marginBottom: SPACING.xs,
+  deedCardBg: {
+    flex: 1,
+    padding: SPACING.md,
   },
   ownerBadge: {
     flexDirection: 'row',
