@@ -1,0 +1,33 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null",
+    "games": {
+      ".indexOn": ["code", "status"],
+      "$gameId": {
+        "players": {
+          "$playerId": {
+            ".read": true,
+            ".write": true
+          }
+        },
+        "properties": {
+          "$propertyId": {
+            ".read": true,
+            ".write": true
+          }
+        },
+        "transactions": {
+          ".indexOn": ["timestamp"],
+          ".read": true,
+          ".write": true
+        },
+        "notifications": {
+          ".indexOn": ["timestamp"],
+          ".read": true,
+          ".write": true
+        }
+      }
+    }
+  }
+}
