@@ -77,7 +77,7 @@ export default function HistoryLogsScreen() {
   }, 0);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
 
       {/* Stats Summary Bar */}
       <View style={[styles.statsBar, { backgroundColor: colors.surface, borderBottomColor: colors.surfaceBorder }]}>
