@@ -290,8 +290,8 @@ export default function PropertiesScreen() {
               key={deed.id}
               style={[
                 styles.deedCard,
-                { backgroundColor: colors.surface, borderColor: colors.surfaceBorder, borderLeftColor: groupColor },
-                isMyProperty && { borderColor: colors.emerald, borderWidth: 1.5 },
+                { backgroundColor: colors.surface, borderColor: colors.surfaceBorder },
+                isMyProperty && { borderColor: colors.emerald, borderWidth: 2 },
                 isOwnedByOther && pState.isMortgaged && styles.mortgagedCard,
               ]}
             >
@@ -301,79 +301,181 @@ export default function PropertiesScreen() {
                 style={styles.deedCardBg}
                 imageStyle={{ opacity: 0.23 }}
               >
-                {/* Header */}
-                <View style={styles.deedHeader}>
-                  <View style={styles.titleCol}>
-                    <View style={[styles.groupPill, { backgroundColor: groupColor }]}>
-                      <Text style={styles.groupPillText}>{deed.group}</Text>
-                    </View>
-                    <Text style={[styles.deedName, { color: colors.textPrimary }]}>{deed.name}</Text>
+                {/* Double Ticket Frame */}
+                <View style={[styles.ticketFrame, { borderColor: groupColor }]}>
+                  
+                  {/* Corner Ornate Symbols */}
+                  <Text style={[styles.cornerSymbol, styles.tlSymbol, { color: groupColor }]}>❖</Text>
+                  <Text style={[styles.cornerSymbol, styles.trSymbol, { color: groupColor }]}>❖</Text>
+                  <Text style={[styles.cornerSymbol, styles.blSymbol, { color: groupColor }]}>❖</Text>
+                  <Text style={[styles.cornerSymbol, styles.brSymbol, { color: groupColor }]}>❖</Text>
+
+                  {/* Group Banner Header */}
+                  <View style={[styles.groupBanner, { backgroundColor: groupColor }]}>
+                    <Text style={styles.groupBannerText}>{deed.group.toUpperCase()}</Text>
+                    {owner ? (
+                      <View style={[styles.bannerOwnerBadge, { backgroundColor: isMyProperty ? 'rgba(16, 185, 129, 0.3)' : 'rgba(0, 0, 0, 0.4)' }]}>
+                        <Text style={styles.bannerOwnerText}>{isMyProperty ? 'YOU OWN THIS' : `OWNER: ${owner.name.toUpperCase()}`}</Text>
+                      </View>
+                    ) : (
+                      <View style={styles.bannerForSaleBadge}>
+                        <Text style={styles.bannerForSaleText}>FOR SALE</Text>
+                      </View>
+                    )}
                   </View>
 
-                  {owner ? (
-                    <View style={[styles.ownerBadge, { backgroundColor: isMyProperty ? colors.emerald + '44' : colors.surfaceLight }]}>
-                      <Text style={[styles.ownerEmoji, { color: colors.textPrimary }]}>{owner.avatar}</Text>
-                      <Text style={[styles.ownerName, { color: colors.textPrimary }]}>{owner.name}</Text>
+                  {/* Ticket Header Row: Title on Left, Price on Right */}
+                  <View style={styles.ticketHeaderRow}>
+                    <View style={styles.ticketTitleCol}>
+                      <Text style={[styles.ticketTitle, { color: colors.textPrimary }]}>{deed.name.toUpperCase()}</Text>
+                      <View style={styles.decUnderlineRow}>
+                        <View style={[styles.decLine, { backgroundColor: colors.surfaceBorder }]} />
+                        <Text style={[styles.decDiamond, { color: groupColor }]}>◆</Text>
+                        <View style={[styles.decLine, { backgroundColor: colors.surfaceBorder }]} />
+                      </View>
                     </View>
-                  ) : (
-                    <View style={[styles.bankBadge, { backgroundColor: colors.primary + '33' }]}>
-                      <Text style={[styles.bankText, { color: colors.primary }]}>For Sale</Text>
-                    </View>
-                  )}
-                </View>
 
-              {/* Price / Mortgage / Rent Row */}
-              <View style={styles.infoRow}>
-                <Text style={[styles.infoLabel, { color: colors.textMuted }]}>Price</Text>
-                <Text style={[styles.infoValue, { color: colors.textSecondary }]}>${deed.purchasePrice.toLocaleString()}</Text>
-                <Text style={[styles.infoLabel, { color: colors.textMuted }]}>Mortgage</Text>
-                <Text style={[styles.infoValue, { color: colors.textSecondary }]}>${deed.mortgageValue.toLocaleString()}</Text>
-                {!pState.isMortgaged && (
-                  <>
-                    <Text style={[styles.infoLabel, { color: colors.textMuted }]}>Rent</Text>
-                    <Text style={[styles.infoValue, styles.rentValue, { color: colors.emerald }]}>
-                      ${rentInfo.finalRent.toLocaleString()}
+                    <View style={styles.ticketPriceCol}>
+                      <View style={[styles.flourishLine, { backgroundColor: colors.surfaceBorder }]} />
+                      <Text style={[styles.ticketPriceText, { color: colors.gold }]}>
+                        ${deed.purchasePrice.toLocaleString()}
+                      </Text>
+                      <View style={[styles.flourishLine, { backgroundColor: colors.surfaceBorder }]} />
+                    </View>
+                  </View>
+
+                  {/* Rent Table with Dotted Leaders */}
+                  <View style={styles.rentTable}>
+                    {deed.type === 'country' ? (
+                      <>
+                        {/* Base Rent */}
+                        <View style={styles.rentLeaderRow}>
+                          <Text style={[styles.rentLabel, { color: (!hasBuildings && !pState.isMortgaged) ? colors.textPrimary : colors.textSecondary }]}>
+                            RENT
+                          </Text>
+                          <Text style={[styles.dottedLeader, { color: colors.surfaceBorder }]} numberOfLines={1}>
+                            ...................................................................................................................
+                          </Text>
+                          <Text style={[styles.rentValueText, { color: colors.textPrimary }]}>
+                            ${deed.rentBase?.toLocaleString()}
+                          </Text>
+                        </View>
+
+                        {/* 1 House */}
+                        {deed.rent1House ? (
+                          <View style={styles.rentLeaderRow}>
+                            <Text style={[styles.rentLabel, houseCount === 1 ? { color: colors.emerald, fontWeight: '900' } : { color: colors.textSecondary }]}>
+                              RENT WITH 1 HOUSE
+                            </Text>
+                            <Text style={[styles.dottedLeader, { color: colors.surfaceBorder }]} numberOfLines={1}>
+                              ...................................................................................................................
+                            </Text>
+                            <Text style={[styles.rentValueText, houseCount === 1 ? { color: colors.emerald, fontWeight: '900' } : { color: colors.textPrimary }]}>
+                              ${deed.rent1House.toLocaleString()}
+                            </Text>
+                          </View>
+                        ) : null}
+
+                        {/* 2 Houses */}
+                        {deed.rent2Houses ? (
+                          <View style={styles.rentLeaderRow}>
+                            <Text style={[styles.rentLabel, houseCount === 2 ? { color: colors.emerald, fontWeight: '900' } : { color: colors.textSecondary }]}>
+                              RENT WITH 2 HOUSES
+                            </Text>
+                            <Text style={[styles.dottedLeader, { color: colors.surfaceBorder }]} numberOfLines={1}>
+                              ...................................................................................................................
+                            </Text>
+                            <Text style={[styles.rentValueText, houseCount === 2 ? { color: colors.emerald, fontWeight: '900' } : { color: colors.textPrimary }]}>
+                              ${deed.rent2Houses.toLocaleString()}
+                            </Text>
+                          </View>
+                        ) : null}
+
+                        {/* 3 Houses */}
+                        {deed.rent3Houses ? (
+                          <View style={styles.rentLeaderRow}>
+                            <Text style={[styles.rentLabel, houseCount === 3 ? { color: colors.emerald, fontWeight: '900' } : { color: colors.textSecondary }]}>
+                              RENT WITH 3 HOUSES
+                            </Text>
+                            <Text style={[styles.dottedLeader, { color: colors.surfaceBorder }]} numberOfLines={1}>
+                              ...................................................................................................................
+                            </Text>
+                            <Text style={[styles.rentValueText, houseCount === 3 ? { color: colors.emerald, fontWeight: '900' } : { color: colors.textPrimary }]}>
+                              ${deed.rent3Houses.toLocaleString()}
+                            </Text>
+                          </View>
+                        ) : null}
+
+                        {/* Hotel */}
+                        {deed.rentHotel ? (
+                          <View style={styles.rentLeaderRow}>
+                            <Text style={[styles.rentLabel, hasHotel ? { color: colors.emerald, fontWeight: '900' } : { color: colors.textSecondary }]}>
+                              RENT WITH HOTEL
+                            </Text>
+                            <Text style={[styles.dottedLeader, { color: colors.surfaceBorder }]} numberOfLines={1}>
+                              ...................................................................................................................
+                            </Text>
+                            <Text style={[styles.rentValueText, hasHotel ? { color: colors.emerald, fontWeight: '900' } : { color: colors.textPrimary }]}>
+                              ${deed.rentHotel.toLocaleString()}
+                            </Text>
+                          </View>
+                        ) : null}
+                      </>
+                    ) : (
+                      /* Transport Deed */
+                      <>
+                        <View style={styles.rentLeaderRow}>
+                          <Text style={[styles.rentLabel, { color: colors.textPrimary }]}>BASE RENT</Text>
+                          <Text style={[styles.dottedLeader, { color: colors.surfaceBorder }]} numberOfLines={1}>
+                            ...................................................................................................................
+                          </Text>
+                          <Text style={[styles.rentValueText, { color: colors.textPrimary }]}>
+                            ${deed.rentBase?.toLocaleString()}
+                          </Text>
+                        </View>
+                        {deed.rent2Owned ? (
+                          <View style={styles.rentLeaderRow}>
+                            <Text style={[styles.rentLabel, { color: colors.textPrimary }]}>IF 2 TRANSPORTS OWNED</Text>
+                            <Text style={[styles.dottedLeader, { color: colors.surfaceBorder }]} numberOfLines={1}>
+                              ...................................................................................................................
+                            </Text>
+                            <Text style={[styles.rentValueText, { color: colors.textPrimary }]}>
+                              ${deed.rent2Owned.toLocaleString()}
+                            </Text>
+                          </View>
+                        ) : null}
+                      </>
+                    )}
+                  </View>
+
+                  {/* Active Rent Breakdown / Monopoly Bonus Notice */}
+                  {rentInfo.breakdown ? (
+                    <Text style={[styles.breakdownText, rentInfo.hasMonopolyBonus && styles.monopolyText]}>
+                      {rentInfo.breakdown.replace(/⭐/g, '[DOUBLED]')}
                     </Text>
-                  </>
-                )}
-              </View>
+                  ) : null}
 
-              {/* Rent breakdown */}
-              {rentInfo.breakdown ? (
-                <Text style={[
-                  styles.breakdownText,
-                  rentInfo.hasMonopolyBonus && styles.monopolyText,
-                ]}>
-                  {rentInfo.breakdown.replace(/⭐/g, '[DOUBLED]')}
-                </Text>
-              ) : null}
+                  {/* Center Line Divider */}
+                  <View style={styles.decUnderlineRow}>
+                    <View style={[styles.decLine, { backgroundColor: colors.surfaceBorder }]} />
+                    <Text style={[styles.decDiamond, { color: groupColor }]}>◆</Text>
+                    <View style={[styles.decLine, { backgroundColor: colors.surfaceBorder }]} />
+                  </View>
 
-              {/* Buildings display */}
-              {deed.type === 'country' && isMyProperty && (
-                <View style={styles.buildingRow}>
-                  <Text style={styles.buildingLabel}>Buildings: </Text>
-                  {pState.isMortgaged ? (
-                    <Text style={styles.mortgagedTag}>MORTGAGED</Text>
-                  ) : hasHotel ? (
-                    <Text style={styles.buildingIcons}>HOTEL</Text>
-                  ) : houseCount > 0 ? (
-                    <Text style={styles.buildingIcons}>{houseCount} House{houseCount > 1 ? 's' : ''} ({houseCount}/3)</Text>
-                  ) : (
-                    <Text style={styles.noBuildings}>No buildings yet</Text>
-                  )}
-                </View>
-              )}
+                  {/* Mortgage & House Value Footer */}
+                  <View style={styles.mortgageFooterRow}>
+                    <Text style={[styles.mortgageFooterText, { color: colors.textSecondary }]}>
+                      MORTGAGE VALUE = ${deed.mortgageValue.toLocaleString()}
+                    </Text>
+                    {deed.housePrice ? (
+                      <Text style={[styles.mortgageFooterText, { color: colors.textSecondary }]}>
+                        HOUSE COST = ${deed.housePrice.toLocaleString()}
+                      </Text>
+                    ) : null}
+                  </View>
 
-              {/* Rent info for houses owned by other players */}
-              {deed.type === 'country' && isOwnedByOther && houseCount > 0 && !hasHotel && (
-                <Text style={styles.buildingHint}>{houseCount} House{houseCount > 1 ? 's' : ''} built</Text>
-              )}
-              {deed.type === 'country' && isOwnedByOther && hasHotel && (
-                <Text style={styles.buildingHint}>Hotel built</Text>
-              )}
-
-              {/* ─── ACTION BUTTONS ─── */}
-              <View style={styles.actionsRow}>
+                  {/* Interactive Action Buttons Bar */}
+                  <View style={styles.actionsRow}>
 
                 {/* Case 1: Bank-owned → buy */}
                 {isBankOwned && (
@@ -488,8 +590,9 @@ export default function PropertiesScreen() {
                   </View>
                 )}
               </View>
-              </ImageBackground>
             </View>
+          </ImageBackground>
+        </View>
           );
         })}
       </ScrollView>
@@ -718,40 +821,142 @@ const styles = StyleSheet.create({
   },
   deedCardBg: {
     flex: 1,
-    padding: SPACING.md,
+    padding: SPACING.xs,
   },
-  ownerBadge: {
+  ticketFrame: {
+    borderWidth: 2,
+    borderRadius: RADIUS.md,
+    padding: SPACING.sm + 2,
+    position: 'relative',
+  },
+  cornerSymbol: {
+    position: 'absolute',
+    fontSize: 12,
+    lineHeight: 12,
+    zIndex: 2,
+  },
+  tlSymbol: { top: 4, left: 5 },
+  trSymbol: { top: 4, right: 5 },
+  blSymbol: { bottom: 4, left: 5 },
+  brSymbol: { bottom: 4, right: 5 },
+
+  groupBanner: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.sm + 2,
+    paddingVertical: 4,
+    borderRadius: RADIUS.sm,
+    marginBottom: SPACING.xs + 2,
+  },
+  groupBannerText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+  bannerOwnerBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: RADIUS.full,
+  },
+  bannerOwnerText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '800',
+  },
+  bannerForSaleBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: RADIUS.full,
+  },
+  bannerForSaleText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+
+  ticketHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.xs + 2,
+  },
+  ticketTitleCol: {
+    flex: 1,
+    paddingRight: SPACING.sm,
+  },
+  ticketTitle: {
+    fontSize: 17,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  decUnderlineRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surfaceLight,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: RADIUS.full,
-    gap: 4,
+    marginVertical: 3,
   },
-  myOwnerBadge: {
-    backgroundColor: COLORS.emerald + '33',
+  decLine: {
+    flex: 1,
+    height: 1,
   },
-  ownerEmoji: {
+  decDiamond: {
+    fontSize: 8,
+    marginHorizontal: 4,
+  },
+  ticketPriceCol: {
+    alignItems: 'center',
+    minWidth: 80,
+  },
+  flourishLine: {
+    width: '100%',
+    height: 1,
+  },
+  ticketPriceText: {
+    fontSize: 22,
+    fontWeight: '900',
+    marginVertical: 1,
+  },
+
+  rentTable: {
+    marginVertical: SPACING.xs,
+    gap: 3,
+  },
+  rentLeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  rentLabel: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.2,
+  },
+  dottedLeader: {
+    flex: 1,
+    fontSize: 10,
+    marginHorizontal: 4,
+    letterSpacing: 1,
+  },
+  rentValueText: {
     fontSize: 12,
     fontWeight: '800',
-    color: COLORS.textPrimary,
   },
-  ownerName: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
+
+  mortgageFooterRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: SPACING.md,
+    marginVertical: SPACING.xs + 2,
+    paddingTop: 2,
   },
-  bankBadge: {
-    backgroundColor: COLORS.gold + '22',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: RADIUS.full,
-  },
-  bankText: {
+  mortgageFooterText: {
     fontSize: 11,
-    color: COLORS.gold,
-    fontWeight: '700',
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   infoRow: {
     flexDirection: 'row',
