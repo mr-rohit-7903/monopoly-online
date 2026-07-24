@@ -57,5 +57,5 @@ export const PLAYER_COLORS = [
 ];
 
 export const PLAYER_AVATARS = [
-  '🎩', '🚗', '🐕', '🚢', '🐱', '🦖', '🦆', '💼', '🏆', '💎', '🚀', '👑'
+  'P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'VIP', 'PRO', 'MAX', 'ACE'
 ];

@@ -97,7 +97,6 @@ export default function LobbyScreen() {
           {isHost ? (
             <Button
               title="Start Game Now"
-              icon="🚀"
               size="lg"
               variant="gold"
               loading={isLoading}
@@ -106,7 +105,7 @@ export default function LobbyScreen() {
           ) : (
             <View style={styles.waitingNotice}>
               <Text style={styles.waitingText}>
-                ⏳ Waiting for host to start the game session...
+                Waiting for host to start the game session...
               </Text>
             </View>
           )}

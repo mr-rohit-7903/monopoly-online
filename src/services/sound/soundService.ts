@@ -34,7 +34,7 @@ class SoundEngine {
   }
 
   /**
-   * 💰 Cash Register / Cha-Ching Sound
+   * Cash Register / Cha-Ching Sound
    * Plays a crisp dual-chime gold coin register sound.
    */
   public playCashSound(): void {
@@ -78,7 +78,7 @@ class SoundEngine {
   }
 
   /**
-   * 🎲 Dice Roll Sound
+   * Dice Roll Sound
    * Simulates dice rattling on the board.
    */
   public playDiceSound(): void {
@@ -111,7 +111,7 @@ class SoundEngine {
   }
 
   /**
-   * 🚨 Rent / Tax Alert Sound
+   * Rent / Tax Alert Sound
    * Plays a quick warning double-beep sound.
    */
   public playAlertSound(): void {
@@ -151,7 +151,7 @@ class SoundEngine {
   }
 
   /**
-   * 🏠 Construction / Build House Sound
+   * Construction / Build House Sound
    * Plays a retro hammer building sound.
    */
   public playBuildSound(): void {
@@ -186,7 +186,7 @@ class SoundEngine {
   }
 
   /**
-   * 🎴 Card Flip / Draw Sound
+   * Card Flip / Draw Sound
    */
   public playCardSound(): void {
     if (!this.soundEnabled) return;

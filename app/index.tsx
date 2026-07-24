@@ -35,7 +35,6 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.heroCard}>
-          <Text style={styles.heroEmoji}>🏦 💵 🎲</Text>
           <Text style={styles.heroTitle}>No More Paper Money!</Text>
           <Text style={styles.heroText}>
             Real-time digital ledger, live property management, automated rent doubling, custom duty, chance cards, and instant transaction notifications for your board game night.
@@ -54,7 +53,7 @@ export default function HomeScreen() {
               }
             >
               <Text style={styles.rejoinButtonText}>
-                ⚡ Rejoin Active Game ({currentGame.code})
+                Rejoin Active Game ({currentGame.code})
               </Text>
             </Pressable>
           ) : null}
@@ -66,7 +65,7 @@ export default function HomeScreen() {
             ]}
             onPress={() => router.push('/create')}
           >
-            <Text style={styles.primaryButtonText}>👑 Create New Game</Text>
+            <Text style={styles.primaryButtonText}>Create New Game</Text>
           </Pressable>
 
           <Pressable
@@ -76,7 +75,7 @@ export default function HomeScreen() {
             ]}
             onPress={() => router.push('/join')}
           >
-            <Text style={styles.secondaryButtonText}>🎮 Join Game with Code</Text>
+            <Text style={styles.secondaryButtonText}>Join Game with Code</Text>
           </Pressable>
         </View>
 

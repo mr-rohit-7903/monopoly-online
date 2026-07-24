@@ -69,11 +69,11 @@ export default function PropertiesScreen() {
 
   const groups = [
     { id: 'all', label: 'All' },
-    { id: 'Europe A (Brown)', label: '🟤 Europe' },
-    { id: 'Asia A (Light Blue)', label: '🔵 Asia' },
-    { id: 'Americas B (Yellow)', label: '🟡 Americas' },
-    { id: 'Africa & Middle East A (Green)', label: '🟢 Africa/ME' },
-    { id: 'Transport', label: '✈️ Transport' },
+    { id: 'Europe A (Brown)', label: 'Europe' },
+    { id: 'Asia A (Light Blue)', label: 'Asia' },
+    { id: 'Americas B (Yellow)', label: 'Americas' },
+    { id: 'Africa & Middle East A (Green)', label: 'Africa/ME' },
+    { id: 'Transport', label: 'Transport' },
   ];
 
   const filteredDeeds = BOARD_PROPERTIES.filter((deed) =>
@@ -97,34 +97,34 @@ export default function PropertiesScreen() {
     if (type === 'buy') {
       title = `Buy ${deed.name}`;
       subtitle = 'Purchase unowned property deed directly from the Bank.';
-      icon = '🏠';
+      icon = '[BUY]';
     } else if (type === 'build') {
       const isHotel = pState.houses === 3;
       title = isHotel ? `Upgrade ${deed.name} to Hotel` : `Build House on ${deed.name}`;
       subtitle = isHotel
         ? 'Replace 3 Houses with a luxury Hotel to maximize rent.'
         : 'Construct a House to increase rent collection for visitors.';
-      icon = isHotel ? '🏨' : '🏡';
+      icon = isHotel ? '[HOTEL]' : '[HOUSE]';
     } else if (type === 'sellBuilding') {
       const isHotel = pState.hotel;
       title = isHotel ? `Sell Hotel on ${deed.name}` : `Sell House on ${deed.name}`;
       subtitle = `Sell building back to Bank for 50% refund (+$${amount.toLocaleString()}).`;
-      icon = '🏷️';
+      icon = '[SELL]';
       isPayout = true;
     } else if (type === 'mortgage') {
       title = `Mortgage ${deed.name}`;
       subtitle = 'Receive immediate cash payout from Bank. Property collects $0 rent while mortgaged.';
-      icon = '🏦';
+      icon = '[MORTGAGE]';
       isPayout = true;
     } else if (type === 'unmortgage') {
       title = `Unmortgage ${deed.name}`;
       subtitle = 'Pay mortgage value + 10% interest to reactivate normal rent collection.';
-      icon = '✅';
+      icon = '[ACTIVE]';
     } else if (type === 'payRent') {
       const owner = players.find((p) => p.id === pState.ownerId);
       title = `Pay Rent on ${deed.name}`;
       subtitle = `Transfer rent payment directly to ${owner?.name || 'Owner'}.`;
-      icon = '💸';
+      icon = '[RENT]';
     }
 
     setActiveModal({
@@ -182,7 +182,7 @@ export default function PropertiesScreen() {
           category: 'p2p',
           propertyId: deed.id,
           propertyName: deed.name,
-          icon: '🏠',
+          icon: 'RENT',
         });
         soundEngine.playCashSound();
         triggerSuccessToast(`Paid $${amount.toLocaleString()} rent to ${owner?.name || 'Owner'}!`);
@@ -206,10 +206,10 @@ export default function PropertiesScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Top Banner Alert for Instant Feedback (no native alert) */}
+      {/* Top Banner Alert for Instant Feedback */}
       {successBanner && (
         <View style={styles.topSuccessBanner}>
-          <Text style={styles.topSuccessText}>🎉 {successBanner}</Text>
+          <Text style={styles.topSuccessText}>{successBanner}</Text>
         </View>
       )}
 
@@ -299,7 +299,7 @@ export default function PropertiesScreen() {
                   </View>
                 ) : (
                   <View style={styles.bankBadge}>
-                    <Text style={styles.bankText}>🏦 For Sale</Text>
+                    <Text style={styles.bankText}>For Sale</Text>
                   </View>
                 )}
               </View>
@@ -326,7 +326,7 @@ export default function PropertiesScreen() {
                   styles.breakdownText,
                   rentInfo.hasMonopolyBonus && styles.monopolyText,
                 ]}>
-                  {rentInfo.breakdown}
+                  {rentInfo.breakdown.replace(/⭐/g, '[DOUBLED]')}
                 </Text>
               ) : null}
 
@@ -335,11 +335,11 @@ export default function PropertiesScreen() {
                 <View style={styles.buildingRow}>
                   <Text style={styles.buildingLabel}>Buildings: </Text>
                   {pState.isMortgaged ? (
-                    <Text style={styles.mortgagedTag}>🔴 MORTGAGED</Text>
+                    <Text style={styles.mortgagedTag}>MORTGAGED</Text>
                   ) : hasHotel ? (
-                    <Text style={styles.buildingIcons}>🏨 HOTEL</Text>
+                    <Text style={styles.buildingIcons}>HOTEL</Text>
                   ) : houseCount > 0 ? (
-                    <Text style={styles.buildingIcons}>{'🏡'.repeat(houseCount)} ({houseCount}/3)</Text>
+                    <Text style={styles.buildingIcons}>{houseCount} House{houseCount > 1 ? 's' : ''} ({houseCount}/3)</Text>
                   ) : (
                     <Text style={styles.noBuildings}>No buildings yet</Text>
                   )}
@@ -348,10 +348,10 @@ export default function PropertiesScreen() {
 
               {/* Rent info for houses owned by other players */}
               {deed.type === 'country' && isOwnedByOther && houseCount > 0 && !hasHotel && (
-                <Text style={styles.buildingHint}>{'🏡'.repeat(houseCount)} {houseCount} house{houseCount > 1 ? 's' : ''} built</Text>
+                <Text style={styles.buildingHint}>{houseCount} House{houseCount > 1 ? 's' : ''} built</Text>
               )}
               {deed.type === 'country' && isOwnedByOther && hasHotel && (
-                <Text style={styles.buildingHint}>🏨 Hotel built</Text>
+                <Text style={styles.buildingHint}>Hotel built</Text>
               )}
 
               {/* ─── ACTION BUTTONS ─── */}
@@ -360,7 +360,7 @@ export default function PropertiesScreen() {
                 {/* Case 1: Bank-owned → buy */}
                 {isBankOwned && (
                   <Button
-                    title={`🏠 Buy ($${deed.purchasePrice.toLocaleString()})`}
+                    title={`Buy ($${deed.purchasePrice.toLocaleString()})`}
                     variant="emerald"
                     size="sm"
                     loading={isLoading}
@@ -376,12 +376,12 @@ export default function PropertiesScreen() {
                       !buildValidation?.canBuild ? (
                         <View style={styles.buildLocked}>
                           <Text style={styles.buildLockedText}>
-                            🔒 {buildValidation?.reason || 'Cannot build on this property'}
+                            [LOCKED] {buildValidation?.reason || 'Cannot build on this property'}
                           </Text>
                         </View>
                       ) : (
                         <Button
-                          title={houseCount === 3 ? '🏨 Upgrade to Hotel' : `🏡 Build House ($${deed.housePrice?.toLocaleString()})`}
+                          title={houseCount === 3 ? 'Upgrade to Hotel' : `Build House ($${deed.housePrice?.toLocaleString()})`}
                           variant="gold"
                           size="sm"
                           loading={isLoading}
@@ -393,7 +393,7 @@ export default function PropertiesScreen() {
                     {/* Sell House / Hotel button (50% refund back to player) */}
                     {deed.type === 'country' && !pState.isMortgaged && hasBuildings && (
                       <Button
-                        title={`🏷️ Sell ${hasHotel ? 'Hotel' : 'House'} (+$${Math.floor((deed.housePrice || 0) * 0.5).toLocaleString()})`}
+                        title={`Sell ${hasHotel ? 'Hotel' : 'House'} (+$${Math.floor((deed.housePrice || 0) * 0.5).toLocaleString()})`}
                         variant="emerald"
                         size="sm"
                         loading={isLoading}
@@ -411,7 +411,7 @@ export default function PropertiesScreen() {
                     {/* Mortgage button: SUSPENDED if property has houses/hotels */}
                     {pState.isMortgaged ? (
                       <Button
-                        title={`✅ Unmortgage ($${calculateUnmortgageCost(deed).toLocaleString()})`}
+                        title={`Unmortgage ($${calculateUnmortgageCost(deed).toLocaleString()})`}
                         variant="primary"
                         size="sm"
                         loading={isLoading}
@@ -422,12 +422,12 @@ export default function PropertiesScreen() {
                     ) : hasBuildings ? (
                       <View style={styles.mortgageSuspendedBox}>
                         <Text style={styles.mortgageSuspendedText}>
-                          🚫 Mortgage Suspended (Sell {hasHotel ? 'Hotel' : 'houses'} first)
+                          Mortgage Suspended (Sell {hasHotel ? 'Hotel' : 'houses'} first)
                         </Text>
                       </View>
                     ) : (
                       <Button
-                        title="🏦 Mortgage"
+                        title="Mortgage"
                         variant="danger"
                         size="sm"
                         loading={isLoading}
@@ -441,7 +441,7 @@ export default function PropertiesScreen() {
                 {isOwnedByOther && !pState.isMortgaged && (
                   <>
                     <Button
-                      title={`💸 Pay Rent ($${rentInfo.finalRent.toLocaleString()})`}
+                      title={`Pay Rent ($${rentInfo.finalRent.toLocaleString()})`}
                       variant="danger"
                       size="sm"
                       loading={isLoading}
@@ -449,7 +449,7 @@ export default function PropertiesScreen() {
                     />
                     {!hasBuildings && (
                       <Button
-                        title="🤝 Offer Trade"
+                        title="Offer Trade"
                         variant="secondary"
                         size="sm"
                         loading={isLoading}
@@ -466,7 +466,7 @@ export default function PropertiesScreen() {
                 {/* Case 4: Another player owns it, but it's mortgaged */}
                 {isOwnedByOther && pState.isMortgaged && (
                   <View style={styles.mortgagedNotice}>
-                    <Text style={styles.mortgagedNoticeText}>🔴 Mortgaged — No Rent Due</Text>
+                    <Text style={styles.mortgagedNoticeText}>Mortgaged — No Rent Due</Text>
                   </View>
                 )}
               </View>
@@ -475,7 +475,7 @@ export default function PropertiesScreen() {
         })}
       </ScrollView>
 
-      {/* ─── CUSTOM ACTION CONFIRMATION MODAL (NO NATIVE ALERTS) ─── */}
+      {/* ─── CUSTOM ACTION CONFIRMATION MODAL ─── */}
       {activeModal && (
         <Modal
           animationType="fade"
@@ -540,7 +540,7 @@ export default function PropertiesScreen() {
                 {/* Error / Warning Banner inside Modal */}
                 {modalError && (
                   <View style={styles.modalErrorBox}>
-                    <Text style={styles.modalErrorText}>⚠️ {modalError}</Text>
+                    <Text style={styles.modalErrorText}>[WARNING] {modalError}</Text>
                   </View>
                 )}
 
@@ -548,7 +548,7 @@ export default function PropertiesScreen() {
                 {!activeModal.isPayout && currentPlayer.balance < activeModal.amount && (
                   <View style={styles.modalErrorBox}>
                     <Text style={styles.modalErrorText}>
-                      ⚠️ Insufficient Funds! You need $${activeModal.amount.toLocaleString()} but only have $${currentPlayer.balance.toLocaleString()}.
+                      [WARNING] Insufficient Funds! You need $${activeModal.amount.toLocaleString()} but only have $${currentPlayer.balance.toLocaleString()}.
                     </Text>
                   </View>
                 )}
@@ -709,7 +709,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.emerald + '33',
   },
   ownerEmoji: {
-    fontSize: 14,
+    fontSize: 12,
+    fontWeight: '800',
+    color: COLORS.textPrimary,
   },
   ownerName: {
     fontSize: 12,
@@ -770,7 +772,7 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
   },
   buildingIcons: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
     color: COLORS.gold,
   },
@@ -859,7 +861,9 @@ const styles = StyleSheet.create({
     gap: SPACING.sm,
   },
   modalHeaderEmoji: {
-    fontSize: 28,
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#FFFFFF',
   },
   modalHeaderTag: {
     color: '#FFFFFF',

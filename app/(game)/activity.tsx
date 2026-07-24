@@ -4,122 +4,100 @@ import {
   TextInput, Pressable, ActivityIndicator,
 } from 'react-native';
 import { COLORS, RADIUS, SPACING } from '../../src/constants/theme';
+import { useAuthStore } from '../../src/store/useAuthStore';
 import { useGameStore } from '../../src/store/useGameStore';
-import { useNotificationStore } from '../../src/store/useNotificationStore';
 import { subscribeToTransactions } from '../../src/services/firebase/transactionService';
-import { Transaction, TransactionCategory } from '../../src/types/transaction';
+import { Transaction } from '../../src/types/transaction';
 import { AppNotification } from '../../src/types/notification';
 
 type FilterType = 'all' | 'p2p' | 'property' | 'building' | 'mortgage' | 'banker';
 
 export default function HistoryLogsScreen() {
-  const { currentGame } = useGameStore();
-  const { notificationHistory } = useNotificationStore();
+  const { userId } = useAuthStore();
+  const { currentGame, players } = useGameStore();
 
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [logs, setLogs] = useState<(Transaction | AppNotification)[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
-  // Real-time subscription to Firebase transactions node
   useEffect(() => {
-    if (!currentGame?.id) {
-      setLoading(false);
-      return;
-    }
-
+    if (!currentGame?.id) return;
     setLoading(true);
+
     const unsubscribe = subscribeToTransactions(currentGame.id, (txList) => {
-      setTransactions(txList);
+      setLogs(txList);
       setLoading(false);
     });
 
     return () => unsubscribe();
   }, [currentGame?.id]);
 
-  // Combine or fallback to notification history if transactions list is empty
-  const logEntries: (Transaction | AppNotification)[] =
-    transactions.length > 0 ? transactions : notificationHistory;
+  if (!currentGame) {
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator color={COLORS.gold} size="large" />
+        <Text style={styles.emptyText}>Loading history log ledger...</Text>
+      </View>
+    );
+  }
 
-  // Compute summary stats
-  const totalVolume = transactions.reduce((acc, t) => acc + (t.amount || 0), 0);
+  // Filter logs by category and search term
+  const filteredLogs = logs.filter((item) => {
+    const isTx = 'category' in item;
+    const category = isTx ? (item as Transaction).category : (item as AppNotification).type;
 
-  // Filter logs by search query & category filter
-  const filteredLogs = logEntries.filter((item) => {
-    // Search query filter
-    const query = searchQuery.trim().toLowerCase();
-    if (query.length > 0) {
-      const matchSender = ('senderName' in item ? item.senderName : '')?.toLowerCase().includes(query);
-      const matchReceiver = ('receiverName' in item ? item.receiverName : '')?.toLowerCase().includes(query);
-      const matchReason = (item.reason || ('message' in item ? item.message : '') || '')?.toLowerCase().includes(query);
-      const matchProp = ('propertyName' in item ? item.propertyName || '' : '')?.toLowerCase().includes(query);
-      if (!matchSender && !matchReceiver && !matchReason && !matchProp) {
-        return false;
-      }
-    }
+    // Filter tab condition
+    if (activeFilter === 'p2p' && category !== 'p2p') return false;
+    if (activeFilter === 'property' && category !== 'property_buy') return false;
+    if (activeFilter === 'building' && category !== 'house_build' && category !== 'hotel_build' && category !== 'house_sell' && category !== 'hotel_sell') return false;
+    if (activeFilter === 'mortgage' && category !== 'mortgage' && category !== 'unmortgage' && category !== 'bank_collect') return false;
+    if (activeFilter === 'banker' && category !== 'bank_deposit' && category !== 'bank_collect') return false;
 
-    // Category tab filter
-    if (activeFilter === 'all') return true;
+    // Search query condition
+    if (searchQuery.trim().length > 0) {
+      const q = searchQuery.toLowerCase();
+      const sender = (isTx ? (item as Transaction).senderName : (item as AppNotification).senderName || '').toLowerCase();
+      const receiver = (isTx ? (item as Transaction).receiverName : (item as AppNotification).receiverName || '').toLowerCase();
+      const reason = (isTx ? (item as Transaction).reason : (item as AppNotification).message || '').toLowerCase();
+      const propName = (isTx ? (item as Transaction).propertyName || '' : '').toLowerCase();
 
-    const cat = 'category' in item ? item.category : item.type;
-
-    if (activeFilter === 'p2p') {
-      return cat === 'p2p' || cat === 'rent' || cat === 'multi_collect' || cat === 'multi_pay';
-    }
-    if (activeFilter === 'property') {
-      return cat === 'property_buy' || cat === 'property_sell' || cat === 'property';
-    }
-    if (activeFilter === 'building') {
-      return (
-        cat === 'house_build' ||
-        cat === 'hotel_build' ||
-        cat === 'house_sell' ||
-        cat === 'hotel_sell'
-      );
-    }
-    if (activeFilter === 'mortgage') {
-      return cat === 'mortgage' || cat === 'unmortgage' || cat === 'bank_collect' || cat === 'tax';
-    }
-    if (activeFilter === 'banker') {
-      return cat === 'banker_action' || cat === 'bank_deposit' || cat === 'salary';
+      return sender.includes(q) || receiver.includes(q) || reason.includes(q) || propName.includes(q);
     }
 
     return true;
   });
 
+  // Calculate volume summary stats
+  const totalVolume = logs.reduce((sum, item) => {
+    return sum + ('amount' in item ? (item as Transaction).amount || 0 : 0);
+  }, 0);
+
   return (
     <View style={styles.container}>
 
-      {/* Top Header Summary Card */}
-      <View style={styles.statsCard}>
-        <View style={styles.statsRow}>
-          <View style={styles.statCol}>
-            <Text style={styles.statLabel}>Total Transactions</Text>
-            <Text style={styles.statNum}>{logEntries.length}</Text>
-          </View>
-
-          <View style={styles.statDivider} />
-
-          <View style={styles.statCol}>
-            <Text style={styles.statLabel}>Volume Traded</Text>
-            <Text style={styles.statNumGold}>${totalVolume.toLocaleString()}</Text>
-          </View>
-
-          <View style={styles.statDivider} />
-
-          <View style={styles.statCol}>
-            <Text style={styles.statLabel}>Sync Status</Text>
-            <View style={styles.syncBadge}>
-              <View style={styles.syncDot} />
-              <Text style={styles.syncText}>Live DB</Text>
-            </View>
-          </View>
+      {/* Stats Summary Bar */}
+      <View style={styles.statsBar}>
+        <View style={styles.statBox}>
+          <Text style={styles.statLabel}>Total Transactions</Text>
+          <Text style={styles.statValue}>{logs.length}</Text>
+        </View>
+        <View style={styles.statDivider} />
+        <View style={styles.statBox}>
+          <Text style={styles.statLabel}>Funds Moved</Text>
+          <Text style={[styles.statValue, { color: COLORS.emerald }]}>
+            ${totalVolume.toLocaleString()}
+          </Text>
+        </View>
+        <View style={styles.statDivider} />
+        <View style={styles.statBox}>
+          <Text style={styles.statLabel}>Active Players</Text>
+          <Text style={styles.statValue}>{players.length}</Text>
         </View>
       </View>
 
       {/* Search Input Bar */}
       <View style={styles.searchContainer}>
-        <Text style={styles.searchIcon}>🔍</Text>
         <TextInput
           style={styles.searchInput}
           placeholder="Search by player, property, or action..."
@@ -139,11 +117,11 @@ export default function HistoryLogsScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
           {[
             { id: 'all', label: 'All Logs' },
-            { id: 'p2p', label: '💸 Payments & Rent' },
-            { id: 'property', label: '🏠 Property Deeds' },
-            { id: 'building', label: '🏡 Houses & Hotels' },
-            { id: 'mortgage', label: '🏦 Mortgages & Taxes' },
-            { id: 'banker', label: '👑 Banker Actions' },
+            { id: 'p2p', label: 'Payments & Rent' },
+            { id: 'property', label: 'Property Deeds' },
+            { id: 'building', label: 'Houses & Hotels' },
+            { id: 'mortgage', label: 'Mortgages & Taxes' },
+            { id: 'banker', label: 'Banker Actions' },
           ].map((btn) => {
             const isSelected = activeFilter === btn.id;
             return (
@@ -170,7 +148,6 @@ export default function HistoryLogsScreen() {
           </View>
         ) : filteredLogs.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyEmoji}>📜</Text>
             <Text style={styles.emptyTitle}>
               {searchQuery.length > 0 ? 'No Matching Logs Found' : 'No History Logs Recorded Yet'}
             </Text>
@@ -206,99 +183,101 @@ function HistoryLogCard({ item }: { item: Transaction | AppNotification }) {
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const getCategoryMeta = (): { label: string; color: string; icon: string } => {
+  const getCategoryMeta = (): { label: string; color: string; tag: string } => {
     if (isTransaction) {
       const tx = item as Transaction;
       switch (tx.category) {
         case 'property_buy':
-          return { label: 'BUY PROPERTY', color: COLORS.emerald, icon: '🏠' };
+          return { label: 'BUY PROPERTY', color: COLORS.emerald, tag: 'BUY' };
         case 'house_build':
-          return { label: 'HOUSE BUILT', color: COLORS.gold, icon: '🏡' };
+          return { label: 'HOUSE BUILT', color: COLORS.gold, tag: 'BUILD' };
         case 'hotel_build':
-          return { label: 'HOTEL BUILT', color: COLORS.gold, icon: '🏨' };
+          return { label: 'HOTEL BUILT', color: COLORS.gold, tag: 'HOTEL' };
         case 'house_sell':
-          return { label: 'HOUSE SOLD', color: '#F97316', icon: '🏷️' };
+          return { label: 'HOUSE SOLD', color: '#F97316', tag: 'SELL' };
         case 'hotel_sell':
-          return { label: 'HOTEL SOLD', color: '#F97316', icon: '🏷️' };
+          return { label: 'HOTEL SOLD', color: '#F97316', tag: 'SELL' };
         case 'mortgage':
-          return { label: 'MORTGAGED', color: COLORS.crimson, icon: '🏦' };
+          return { label: 'MORTGAGED', color: COLORS.crimson, tag: 'MORTGAGE' };
         case 'unmortgage':
-          return { label: 'UNMORTGAGED', color: COLORS.emerald, icon: '✅' };
+          return { label: 'UNMORTGAGED', color: COLORS.emerald, tag: 'ACTIVE' };
         case 'bank_deposit':
-          return { label: 'BANK PAYOUT', color: COLORS.emerald, icon: '💵' };
+          return { label: 'BANK PAYOUT', color: COLORS.emerald, tag: 'PAYOUT' };
         case 'bank_collect':
-          return { label: 'BANK FINE', color: COLORS.crimson, icon: '🏛️' };
+          return { label: 'BANK FINE', color: COLORS.crimson, tag: 'FINE' };
         case 'multi_collect':
-          return { label: 'PARTY HOUSE', color: '#A855F7', icon: '🎉' };
+          return { label: 'PARTY HOUSE', color: '#A855F7', tag: 'PARTY' };
         case 'multi_pay':
-          return { label: 'RESORTS EXPENSE', color: '#EC4899', icon: '🏖️' };
+          return { label: 'RESORTS EXPENSE', color: '#EC4899', tag: 'RESORT' };
         case 'p2p':
-          return { label: 'RENT / P2P', color: COLORS.primary, icon: '💸' };
+          return { label: 'RENT / P2P', color: COLORS.primary, tag: 'RENT' };
         default:
-          return { label: 'TRANSACTION', color: COLORS.primary, icon: '📌' };
+          return { label: 'TRANSACTION', color: COLORS.primary, tag: 'LOG' };
       }
     } else {
       const notif = item as AppNotification;
       return {
         label: notif.type.toUpperCase(),
         color: COLORS.primary,
-        icon: notif.icon || '📌',
+        tag: 'NOTIF',
       };
     }
   };
 
   const meta = getCategoryMeta();
-  const senderName = 'senderName' in item ? item.senderName : '';
-  const receiverName = 'receiverName' in item ? item.receiverName : '';
-  const reason = item.reason || ('message' in item ? item.message : '');
 
-  return (
-    <View style={styles.logCard}>
-      {/* Top Header Row */}
-      <View style={styles.logHeaderRow}>
-        <View style={[styles.catBadge, { backgroundColor: meta.color + '22', borderColor: meta.color + '55' }]}>
-          <Text style={styles.catIcon}>{meta.icon}</Text>
-          <Text style={[styles.catLabel, { color: meta.color }]}>{meta.label}</Text>
+  if (isTransaction) {
+    const tx = item as Transaction;
+    return (
+      <View style={[styles.card, { borderLeftColor: meta.color }]}>
+        <View style={styles.cardHeader}>
+          <View style={styles.cardHeaderLeft}>
+            <View style={[styles.categoryBadge, { backgroundColor: meta.color + '22', borderColor: meta.color }]}>
+              <Text style={[styles.badgeText, { color: meta.color }]}>{meta.label}</Text>
+            </View>
+          </View>
+          <Text style={styles.timeText}>{formatTime(timestamp)}</Text>
         </View>
 
-        <Text style={styles.logTime}>{formatTime(timestamp)}</Text>
-      </View>
+        <View style={styles.cardBody}>
+          <Text style={styles.partyText}>
+            <Text style={styles.boldText}>{tx.senderName || 'Bank'}</Text> → <Text style={styles.boldText}>{tx.receiverName || 'Bank'}</Text>
+          </Text>
 
-      {/* Main Flow & Reason */}
-      <View style={styles.logBodyRow}>
-        <View style={styles.flowCol}>
-          {senderName && receiverName ? (
-            <View style={styles.flowRow}>
-              <Text style={styles.senderText}>{senderName}</Text>
+          <Text style={styles.reasonText}>{tx.reason}</Text>
 
-            </View>
-          ) : null}
-
-          <Text style={styles.reasonText}>{reason}</Text>
-
-          {'propertyName' in item && item.propertyName && (
+          {tx.propertyName && (
             <View style={styles.propPill}>
-              <Text style={styles.propPillText}>📍 {item.propertyName}</Text>
+              <Text style={styles.propPillText}>{tx.propertyName}</Text>
             </View>
           )}
         </View>
 
-        {/* Amount */}
-        {item.amount ? (
-          <View style={styles.amountCol}>
-            <Text style={[
-              styles.amountText,
-              senderName === 'BANK' || meta.label.includes('SOLD') || meta.label.includes('MORTGAGED')
-                ? styles.positiveText
-                : styles.neutralText,
-            ]}>
-              ${item.amount.toLocaleString()}
-            </Text>
-          </View>
-        ) : null}
+        <View style={styles.cardFooter}>
+          <Text style={styles.amountLabel}>Total Amount:</Text>
+          <Text style={[styles.amountValue, { color: meta.color }]}>
+            ${(tx.amount || 0).toLocaleString()}
+          </Text>
+        </View>
       </View>
-    </View>
-  );
+    );
+  } else {
+    const notif = item as AppNotification;
+    return (
+      <View style={[styles.card, { borderLeftColor: COLORS.purple }]}>
+        <View style={styles.cardHeader}>
+          <View style={[styles.categoryBadge, { backgroundColor: COLORS.purple + '22', borderColor: COLORS.purple }]}>
+            <Text style={[styles.badgeText, { color: COLORS.purple }]}>{notif.title}</Text>
+          </View>
+          <Text style={styles.timeText}>{formatTime(timestamp)}</Text>
+        </View>
+
+        <View style={styles.cardBody}>
+          <Text style={styles.reasonText}>{notif.message}</Text>
+        </View>
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
@@ -306,61 +285,41 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  statsCard: {
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: SPACING.md,
+  },
+  statsBar: {
+    flexDirection: 'row',
     backgroundColor: COLORS.surface,
-    padding: SPACING.md,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.sm,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.surfaceBorder,
-  },
-  statsRow: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
   },
-  statCol: {
+  statBox: {
     alignItems: 'center',
   },
   statLabel: {
-    fontSize: 11,
+    fontSize: 10,
     color: COLORS.textMuted,
-    fontWeight: '600',
-    marginBottom: 2,
+    textTransform: 'uppercase',
+    fontWeight: '700',
   },
-  statNum: {
-    fontSize: 18,
-    fontWeight: '800',
+  statValue: {
+    fontSize: 16,
+    fontWeight: '900',
     color: COLORS.textPrimary,
-  },
-  statNumGold: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: COLORS.gold,
+    marginTop: 2,
   },
   statDivider: {
     width: 1,
-    height: 28,
+    height: 24,
     backgroundColor: COLORS.surfaceBorder,
-  },
-  syncBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    backgroundColor: COLORS.emerald + '22',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: RADIUS.full,
-    marginTop: 2,
-  },
-  syncDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: COLORS.emerald,
-  },
-  syncText: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: COLORS.emerald,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -373,15 +332,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.surfaceBorder,
   },
-  searchIcon: {
-    fontSize: 16,
-    marginRight: SPACING.xs,
-  },
   searchInput: {
     flex: 1,
     height: 42,
     color: COLORS.textPrimary,
-    fontSize: 14,
+    fontSize: 13,
   },
   clearSearchText: {
     color: COLORS.textMuted,
@@ -390,7 +345,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   filterRow: {
-    paddingVertical: SPACING.sm,
+    marginVertical: SPACING.sm,
   },
   filterScroll: {
     paddingHorizontal: SPACING.md,
@@ -415,28 +370,24 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: SPACING.md,
-    gap: SPACING.sm,
+    gap: SPACING.md,
   },
   emptyContainer: {
+    padding: SPACING.xxl,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: SPACING.xxl,
-  },
-  emptyEmoji: {
-    fontSize: 48,
-    marginBottom: SPACING.sm,
   },
   emptyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '800',
     color: COLORS.textPrimary,
+    marginTop: SPACING.md,
+    marginBottom: SPACING.xs,
   },
   emptyText: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.textMuted,
     textAlign: 'center',
-    marginTop: SPACING.xs,
-    paddingHorizontal: SPACING.lg,
     lineHeight: 18,
   },
   resetBtn: {
@@ -445,109 +396,90 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
     borderRadius: RADIUS.md,
-    borderWidth: 1,
-    borderColor: COLORS.surfaceBorder,
   },
   resetBtnText: {
     color: COLORS.gold,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '700',
   },
-  logCard: {
+  card: {
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.md,
     padding: SPACING.md,
+    borderLeftWidth: 5,
     borderWidth: 1,
     borderColor: COLORS.surfaceBorder,
   },
-  logHeaderRow: {
+  cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: SPACING.xs,
   },
-  catBadge: {
+  cardHeaderLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: SPACING.xs,
+  },
+  categoryBadge: {
     paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
+    paddingVertical: 2,
+    borderRadius: RADIUS.sm,
     borderWidth: 1,
-    gap: 4,
   },
-  catIcon: {
-    fontSize: 12,
-  },
-  catLabel: {
+  badgeText: {
     fontSize: 10,
-    fontWeight: '800',
+    fontWeight: '900',
     letterSpacing: 0.5,
   },
-  logTime: {
+  timeText: {
     fontSize: 11,
     color: COLORS.textMuted,
-    fontWeight: '600',
   },
-  logBodyRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginTop: 4,
+  cardBody: {
+    marginVertical: SPACING.xs,
   },
-  flowCol: {
-    flex: 1,
-    paddingRight: SPACING.sm,
+  partyText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginBottom: 4,
   },
-  flowRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginBottom: 2,
-  },
-  senderText: {
-    fontSize: 13,
-    fontWeight: '700',
+  boldText: {
+    fontWeight: '800',
     color: COLORS.textPrimary,
   },
-  arrowText: {
-    fontSize: 12,
-    color: COLORS.textMuted,
-  },
-  receiverText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: COLORS.gold,
-  },
   reasonText: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    marginTop: 2,
-    lineHeight: 16,
+    fontSize: 13,
+    color: COLORS.textMuted,
   },
   propPill: {
     alignSelf: 'flex-start',
     backgroundColor: COLORS.surfaceLight,
-    paddingHorizontal: 6,
+    paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,
     marginTop: 6,
   },
   propPillText: {
     fontSize: 11,
-    color: COLORS.textSecondary,
-    fontWeight: '600',
-  },
-  amountCol: {
-    alignItems: 'flex-end',
-  },
-  amountText: {
-    fontSize: 16,
-    fontWeight: '800',
-  },
-  positiveText: {
-    color: COLORS.emerald,
-  },
-  neutralText: {
     color: COLORS.gold,
+    fontWeight: '700',
+  },
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: SPACING.xs,
+    paddingTop: SPACING.xs,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.surfaceBorder,
+  },
+  amountLabel: {
+    fontSize: 11,
+    color: COLORS.textMuted,
+  },
+  amountValue: {
+    fontSize: 16,
+    fontWeight: '900',
   },
 });

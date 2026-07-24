@@ -40,17 +40,17 @@ export const PlayerBadge: React.FC<PlayerBadgeProps> = ({
           <View style={styles.badgeRow}>
             {player.isHost && (
               <View style={styles.hostBadge}>
-                <Text style={styles.badgeText}>👑 Host</Text>
+                <Text style={styles.badgeText}>Host</Text>
               </View>
             )}
             {player.isBanker && (
               <View style={styles.bankerBadge}>
-                <Text style={styles.badgeText}>🏦 Banker</Text>
+                <Text style={styles.badgeText}>Banker</Text>
               </View>
             )}
             {player.inJail && (
               <View style={styles.jailBadge}>
-                <Text style={styles.badgeText}>🚔 In Jail</Text>
+                <Text style={styles.badgeText}>In Jail</Text>
               </View>
             )}
           </View>

@@ -48,7 +48,7 @@ export const CardDrawerModal: React.FC<CardDrawerModalProps> = ({
           senderId: currentPlayer.id,
           amount: selectedCard.amount,
           reason: `Card: ${selectedCard.title}`,
-          icon: '🎴',
+          icon: 'CARD',
         });
       } else if (selectedCard.action === 'receive_bank' && selectedCard.amount) {
         await depositFromBank({
@@ -56,7 +56,7 @@ export const CardDrawerModal: React.FC<CardDrawerModalProps> = ({
           receiverId: currentPlayer.id,
           amount: selectedCard.amount,
           reason: `Card: ${selectedCard.title}`,
-          icon: '🎴',
+          icon: 'CARD',
         });
       } else if (selectedCard.action === 'collect_all' && selectedCard.amount) {
         await executeMultiCollect({
@@ -64,10 +64,10 @@ export const CardDrawerModal: React.FC<CardDrawerModalProps> = ({
           receiverId: currentPlayer.id,
           amountPerPlayer: selectedCard.amount,
           reason: `Card: ${selectedCard.title}`,
-          icon: '🎉',
+          icon: 'PARTY',
         });
       } else if (selectedCard.action === 'go_to_jail') {
-        Alert.alert('🚔 Go to Jail!', 'Sent directly to Jail. Do not pass GO, do not collect salary.');
+        Alert.alert('Go to Jail!', 'Sent directly to Jail. Do not pass GO, do not collect salary.');
       } else {
         Alert.alert('Card Action Executed', selectedCard.effectText);
       }
@@ -86,7 +86,7 @@ export const CardDrawerModal: React.FC<CardDrawerModalProps> = ({
       <View style={styles.overlay}>
         <View style={styles.modalCard}>
           <View style={styles.header}>
-            <Text style={styles.title}>🎴 Chance & Community Chest</Text>
+            <Text style={styles.title}>Chance & Community Chest</Text>
             <Pressable onPress={onClose} style={styles.closeBtn}>
               <Text style={styles.closeText}>✕</Text>
             </Pressable>
@@ -102,7 +102,7 @@ export const CardDrawerModal: React.FC<CardDrawerModalProps> = ({
               }}
             >
               <Text style={[styles.deckBtnText, deckType === 'chance' && styles.deckTextActive]}>
-                ❓ Chance Deck
+                Chance Deck
               </Text>
             </Pressable>
             <Pressable
@@ -113,13 +113,13 @@ export const CardDrawerModal: React.FC<CardDrawerModalProps> = ({
               }}
             >
               <Text style={[styles.deckBtnText, deckType === 'community_chest' && styles.deckTextActive]}>
-                📦 Community Chest
+                Community Chest
               </Text>
             </Pressable>
           </View>
 
           <Button
-            title="🎲 Draw Card by Dice Roll"
+            title="Draw Card by Dice Roll"
             variant="gold"
             size="md"
             onPress={handleDrawRandom}
@@ -154,7 +154,6 @@ export const CardDrawerModal: React.FC<CardDrawerModalProps> = ({
 
               <Button
                 title="Execute Card Effect"
-                icon="⚡"
                 variant="emerald"
                 size="lg"
                 loading={loading}

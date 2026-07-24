@@ -48,7 +48,7 @@ export function IncomingTradeModal({
       await acceptTradeProposal(gameId, trade.id, currentPlayerId);
       soundEngine.playCashSound();
       onClose();
-      Alert.alert('🤝 Trade Accepted!', `Assets and cash have been exchanged with ${trade.senderName}!`);
+      Alert.alert('Trade Accepted!', `Assets and cash have been exchanged with ${trade.senderName}!`);
     } catch (err: any) {
       setErrorMsg(err?.message || 'Failed to accept trade proposal.');
     } finally {
@@ -76,7 +76,6 @@ export function IncomingTradeModal({
 
           {/* Modal Header */}
           <View style={styles.header}>
-            <Text style={styles.headerEmoji}>🤝</Text>
             <View>
               <Text style={styles.title}>Trade Proposal Received</Text>
               <Text style={styles.subtitle}>{trade.senderName} proposed a deal with you</Text>
@@ -87,10 +86,10 @@ export function IncomingTradeModal({
 
             {/* YOU RECEIVE */}
             <View style={styles.dealBoxPositive}>
-              <Text style={styles.boxTitle}>🟢 YOU RECEIVE (From {trade.senderName})</Text>
+              <Text style={styles.boxTitle}>YOU RECEIVE (From {trade.senderName})</Text>
 
               {trade.senderCash > 0 && (
-                <Text style={styles.cashText}>💵 +${trade.senderCash.toLocaleString()}</Text>
+                <Text style={styles.cashText}>+${trade.senderCash.toLocaleString()}</Text>
               )}
 
               {senderPropNames.length > 0 ? (
@@ -100,7 +99,7 @@ export function IncomingTradeModal({
                     const groupColor = GROUP_COLORS[deed.group] || COLORS.primary;
                     return (
                       <View key={deed.id} style={[styles.deedPill, { borderLeftColor: groupColor }]}>
-                        <Text style={styles.deedName}>📍 {deed.name}</Text>
+                        <Text style={styles.deedName}>{deed.name}</Text>
                         <Text style={styles.deedValue}>${deed.purchasePrice}</Text>
                       </View>
                     );
@@ -113,10 +112,10 @@ export function IncomingTradeModal({
 
             {/* YOU GIVE */}
             <View style={styles.dealBoxNegative}>
-              <Text style={styles.boxTitle}>🔴 YOU GIVE (To {trade.senderName})</Text>
+              <Text style={styles.boxTitle}>YOU GIVE (To {trade.senderName})</Text>
 
               {trade.receiverCash > 0 && (
-                <Text style={styles.cashTextRed}>💵 -${trade.receiverCash.toLocaleString()}</Text>
+                <Text style={styles.cashTextRed}>-${trade.receiverCash.toLocaleString()}</Text>
               )}
 
               {receiverPropNames.length > 0 ? (
@@ -126,7 +125,7 @@ export function IncomingTradeModal({
                     const groupColor = GROUP_COLORS[deed.group] || COLORS.primary;
                     return (
                       <View key={deed.id} style={[styles.deedPill, { borderLeftColor: groupColor }]}>
-                        <Text style={styles.deedName}>📍 {deed.name}</Text>
+                        <Text style={styles.deedName}>{deed.name}</Text>
                         <Text style={styles.deedValue}>${deed.purchasePrice}</Text>
                       </View>
                     );
@@ -139,7 +138,7 @@ export function IncomingTradeModal({
 
             {errorMsg && (
               <View style={styles.errorBox}>
-                <Text style={styles.errorText}>⚠️ {errorMsg}</Text>
+                <Text style={styles.errorText}>[WARNING] {errorMsg}</Text>
               </View>
             )}
 
@@ -148,13 +147,13 @@ export function IncomingTradeModal({
           {/* Footer Buttons */}
           <View style={styles.footer}>
             <Button
-              title="❌ Decline Deal"
+              title="Decline Deal"
               variant="danger"
               loading={loading}
               onPress={handleReject}
             />
             <Button
-              title="✅ Accept Trade Deal"
+              title="Accept Trade Deal"
               variant="emerald"
               loading={loading}
               onPress={handleAccept}

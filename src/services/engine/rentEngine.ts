@@ -50,7 +50,7 @@ export function calculatePropertyRent(
         deed,
         propertyState,
         finalRent: deed.rentHotel,
-        breakdown: `🏨 Hotel Rent: $${deed.rentHotel.toLocaleString()}`,
+        breakdown: `Hotel Rent: $${deed.rentHotel.toLocaleString()}`,
         hasMonopolyBonus,
         canBuildHouses,
       };
@@ -62,7 +62,7 @@ export function calculatePropertyRent(
         deed,
         propertyState,
         finalRent: deed.rent3Houses,
-        breakdown: `🏡🏡🏡 3 Houses: $${deed.rent3Houses.toLocaleString()}`,
+        breakdown: `3 Houses: $${deed.rent3Houses.toLocaleString()}`,
         hasMonopolyBonus,
         canBuildHouses,
       };
@@ -74,7 +74,7 @@ export function calculatePropertyRent(
         deed,
         propertyState,
         finalRent: deed.rent2Houses,
-        breakdown: `🏡🏡 2 Houses: $${deed.rent2Houses.toLocaleString()}`,
+        breakdown: `2 Houses: $${deed.rent2Houses.toLocaleString()}`,
         hasMonopolyBonus,
         canBuildHouses,
       };
@@ -86,7 +86,7 @@ export function calculatePropertyRent(
         deed,
         propertyState,
         finalRent: deed.rent1House,
-        breakdown: `🏡 1 House: $${deed.rent1House.toLocaleString()}`,
+        breakdown: `1 House: $${deed.rent1House.toLocaleString()}`,
         hasMonopolyBonus,
         canBuildHouses,
       };

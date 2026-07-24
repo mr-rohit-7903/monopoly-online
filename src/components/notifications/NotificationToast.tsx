@@ -45,7 +45,7 @@ export const NotificationToast: React.FC = () => {
   return (
     <Animated.View style={[styles.container, animatedStyle]}>
       <Pressable style={styles.toastCard} onPress={hideToast}>
-        <Text style={styles.icon}>{activeToast.icon || '🔔'}</Text>
+        {activeToast.icon ? <Text style={styles.icon}>[{activeToast.icon}]</Text> : null}
         <View style={styles.content}>
           <Text style={styles.title}>{activeToast.title}</Text>
           <Text style={styles.message} numberOfLines={2}>

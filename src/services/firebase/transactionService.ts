@@ -37,7 +37,7 @@ function removeUndefined<T extends Record<string, any>>(obj: T): T {
 
 // 1. Direct Player-to-Player payment
 export async function payPlayerToPlayer(params: ExecutePaymentParams): Promise<void> {
-  const { gameId, senderId, receiverId, amount, reason, category, propertyId, propertyName, icon = '💸' } = params;
+  const { gameId, senderId, receiverId, amount, reason, category, propertyId, propertyName, icon = 'PAY' } = params;
   if (amount <= 0) throw new Error('Transaction amount must be greater than $0.');
 
   const senderSnap = await get(ref(db, `games/${gameId}/players/${senderId}`));
@@ -84,7 +84,7 @@ export async function payPlayerToPlayer(params: ExecutePaymentParams): Promise<v
     type: 'rent' as NotificationType,
     icon,
     title: `${sender.name} paid ${receiver.name}`,
-    message: `${icon} ${sender.name} paid ${receiver.name} $${amount.toLocaleString()} (${reason})`,
+    message: `${sender.name} paid ${receiver.name} $${amount.toLocaleString()} (${reason})`,
     senderId,
     senderName: sender.name,
     receiverId,
@@ -107,7 +107,7 @@ export async function depositFromBank(params: {
   category?: TransactionCategory;
   icon?: string;
 }): Promise<void> {
-  const { gameId, receiverId, amount, reason, category = 'bank_deposit', icon = '🏦' } = params;
+  const { gameId, receiverId, amount, reason, category = 'bank_deposit', icon = 'BANK' } = params;
   if (amount <= 0) throw new Error('Deposit amount must be greater than $0.');
 
   const receiverSnap = await get(ref(db, `games/${gameId}/players/${receiverId}`));
@@ -143,7 +143,7 @@ export async function depositFromBank(params: {
     type: 'salary' as NotificationType,
     icon,
     title: `Bank paid ${receiver.name}`,
-    message: `${icon} Bank paid ${receiver.name} $${amount.toLocaleString()} (${reason})`,
+    message: `Bank paid ${receiver.name} $${amount.toLocaleString()} (${reason})`,
     senderId: 'BANK',
     senderName: 'Bank',
     receiverId,
@@ -168,7 +168,7 @@ export async function collectToBank(params: {
   propertyName?: string;
   icon?: string;
 }): Promise<void> {
-  const { gameId, senderId, amount, reason, category = 'bank_collect', propertyId, propertyName, icon = '🏦' } = params;
+  const { gameId, senderId, amount, reason, category = 'bank_collect', propertyId, propertyName, icon = 'BANK' } = params;
   if (amount <= 0) throw new Error('Payment amount must be greater than $0.');
 
   const senderSnap = await get(ref(db, `games/${gameId}/players/${senderId}`));
@@ -210,7 +210,7 @@ export async function collectToBank(params: {
     type: 'tax' as NotificationType,
     icon,
     title: `${sender.name} paid Bank`,
-    message: `${icon} ${sender.name} paid Bank $${amount.toLocaleString()} (${reason})`,
+    message: `${sender.name} paid Bank $${amount.toLocaleString()} (${reason})`,
     senderId,
     senderName: sender.name,
     receiverId: 'BANK',
@@ -232,7 +232,7 @@ export async function executeMultiCollect(params: {
   reason: string;
   icon?: string;
 }): Promise<void> {
-  const { gameId, receiverId, amountPerPlayer, reason, icon = '🎉' } = params;
+  const { gameId, receiverId, amountPerPlayer, reason, icon = 'PARTY' } = params;
 
   const playersSnap = await get(ref(db, `games/${gameId}/players`));
   if (!playersSnap.exists()) return;
@@ -279,7 +279,7 @@ export async function executeMultiCollect(params: {
     type: 'party' as NotificationType,
     icon,
     title: `${reason}`,
-    message: `${icon} ${receiver.name} collected $${amountPerPlayer.toLocaleString()} from each player ($${totalCollected.toLocaleString()} total)`,
+    message: `${receiver.name} collected $${amountPerPlayer.toLocaleString()} from each player ($${totalCollected.toLocaleString()} total)`,
     senderId: 'ALL',
     senderName: 'All Players',
     receiverId,
@@ -301,7 +301,7 @@ export async function executeMultiPay(params: {
   reason: string;
   icon?: string;
 }): Promise<void> {
-  const { gameId, senderId, amountPerPlayer, reason, icon = '🏖️' } = params;
+  const { gameId, senderId, amountPerPlayer, reason, icon = 'RESORT' } = params;
 
   const playersSnap = await get(ref(db, `games/${gameId}/players`));
   if (!playersSnap.exists()) return;
@@ -349,7 +349,7 @@ export async function executeMultiPay(params: {
     type: 'party' as NotificationType,
     icon,
     title: `${reason}`,
-    message: `${icon} ${sender.name} paid $${amountPerPlayer.toLocaleString()} to each player for vacation expenses`,
+    message: `${sender.name} paid $${amountPerPlayer.toLocaleString()} to each player for vacation expenses`,
     senderId,
     senderName: sender.name,
     receiverId: 'ALL',

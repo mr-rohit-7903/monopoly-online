@@ -65,12 +65,12 @@ export default function DashboardScreen() {
         receiverId: currentPlayer.id,
         amount: 1500,
         reason: 'GO Salary',
-        icon: '🏦',
+        icon: 'BANK',
       });
       soundEngine.playCashSound();
-      showBanner('🎉 Collected $1,500 GO Salary from Bank!');
+      showBanner('Collected $1,500 GO Salary from Bank!');
     } catch (err: any) {
-      showBanner(`⚠️ ${err?.message || 'Could not collect GO salary.'}`);
+      showBanner(`[WARNING] ${err?.message || 'Could not collect GO salary.'}`);
     } finally {
       setActionLoading(false);
     }
@@ -85,12 +85,12 @@ export default function DashboardScreen() {
         receiverId: currentPlayer.id,
         amountPerPlayer: 200,
         reason: 'Party House',
-        icon: '🎉',
+        icon: 'PARTY',
       });
       soundEngine.playCashSound();
-      showBanner('🎉 Collected $200 Party House contribution from each player!');
+      showBanner('Collected $200 Party House contribution from each player!');
     } catch (err: any) {
-      showBanner(`⚠️ ${err?.message || 'Could not collect Party House payments.'}`);
+      showBanner(`[WARNING] ${err?.message || 'Could not collect Party House payments.'}`);
     } finally {
       setActionLoading(false);
     }
@@ -105,11 +105,11 @@ export default function DashboardScreen() {
         senderId: currentPlayer.id,
         amountPerPlayer: 200,
         reason: 'Resorts Vacation Expenses',
-        icon: '🏖️',
+        icon: 'RESORT',
       });
-      showBanner('🏖️ Paid $200 Resort expenses to each player.');
+      showBanner('Paid $200 Resort expenses to each player.');
     } catch (err: any) {
-      showBanner(`⚠️ ${err?.message || 'Could not execute Resorts payment.'}`);
+      showBanner(`[WARNING] ${err?.message || 'Could not execute Resorts payment.'}`);
     } finally {
       setActionLoading(false);
     }
@@ -119,7 +119,7 @@ export default function DashboardScreen() {
   const handleCustomDuty = () => {
     const { amount, countryCount } = calculateCustomDuty(myProperties);
     if (countryCount === 0 || amount <= 0) {
-      showBanner('⚠️ You do not own any country sites subject to Custom Duty.');
+      showBanner('[WARNING] You do not own any country sites subject to Custom Duty.');
       return;
     }
 
@@ -127,7 +127,7 @@ export default function DashboardScreen() {
       type: 'custom',
       title: 'Custom Duty Payment',
       subtitle: `Pay $100 per country site to the Bank (${countryCount} site${countryCount > 1 ? 's' : ''} owned).`,
-      icon: '🏛️',
+      icon: 'CUSTOM',
       amount,
       countryCount,
     });
@@ -137,7 +137,7 @@ export default function DashboardScreen() {
   const handleTravellingDuty = () => {
     const { amount, countryCount } = calculateTravellingDuty(myProperties);
     if (countryCount === 0 || amount <= 0) {
-      showBanner('⚠️ You do not own any country sites subject to Travelling Duty.');
+      showBanner('[WARNING] You do not own any country sites subject to Travelling Duty.');
       return;
     }
 
@@ -145,7 +145,7 @@ export default function DashboardScreen() {
       type: 'travelling',
       title: 'Travelling Duty Payment',
       subtitle: `Pay $50 per country site to the Bank (${countryCount} site${countryCount > 1 ? 's' : ''} owned).`,
-      icon: '✈️',
+      icon: 'TRAVEL',
       amount,
       countryCount,
     });
@@ -164,10 +164,10 @@ export default function DashboardScreen() {
         icon: activeDutyModal.icon,
       });
       soundEngine.playCashSound();
-      showBanner(`🎉 Paid $${activeDutyModal.amount.toLocaleString()} ${activeDutyModal.title} to Bank!`);
+      showBanner(`Paid $${activeDutyModal.amount.toLocaleString()} ${activeDutyModal.title} to Bank!`);
       setActiveDutyModal(null);
     } catch (err: any) {
-      showBanner(`⚠️ Payment failed: ${err?.message}`);
+      showBanner(`[WARNING] Payment failed: ${err?.message}`);
     } finally {
       setActionLoading(false);
     }
@@ -181,7 +181,7 @@ export default function DashboardScreen() {
         senderId: currentPlayer.id,
         amount,
         reason,
-        icon: '🏦',
+        icon: 'BANK',
       });
     } else {
       await payPlayerToPlayer({
@@ -191,11 +191,11 @@ export default function DashboardScreen() {
         amount,
         reason,
         category: 'p2p',
-        icon: '💸',
+        icon: 'PAY',
       });
     }
     soundEngine.playCashSound();
-    showBanner(`🎉 Payment of $${amount.toLocaleString()} completed!`);
+    showBanner(`Payment of $${amount.toLocaleString()} completed!`);
   };
 
   return (
@@ -226,7 +226,7 @@ export default function DashboardScreen() {
 
         {/* Pass GO Button */}
         <Button
-          title="🏦 Pass GO — Collect $1,500 Salary"
+          title="Pass GO — Collect $1,500 Salary"
           variant="gold"
           size="lg"
           loading={actionLoading}
@@ -239,31 +239,26 @@ export default function DashboardScreen() {
       <Text style={styles.sectionTitle}>Banking & Quick Actions</Text>
       <View style={styles.actionGrid}>
         <Pressable style={styles.gridCard} onPress={() => setPayModalVisible(true)}>
-          <Text style={styles.gridEmoji}>💸</Text>
           <Text style={styles.gridTitle}>Send Money</Text>
           <Text style={styles.gridSubtitle}>Pay Bank or Player</Text>
         </Pressable>
 
         <Pressable style={styles.gridCard} onPress={handlePartyHouse}>
-          <Text style={styles.gridEmoji}>🎉</Text>
           <Text style={styles.gridTitle}>Party House</Text>
           <Text style={styles.gridSubtitle}>+$200 from each player</Text>
         </Pressable>
 
         <Pressable style={styles.gridCard} onPress={handleResorts}>
-          <Text style={styles.gridEmoji}>🏖️</Text>
           <Text style={styles.gridTitle}>Resorts</Text>
           <Text style={styles.gridSubtitle}>-$200 to each player</Text>
         </Pressable>
 
         <Pressable style={styles.gridCard} onPress={handleCustomDuty}>
-          <Text style={styles.gridEmoji}>🏛️</Text>
           <Text style={styles.gridTitle}>Custom Duty</Text>
           <Text style={styles.gridSubtitle}>$100 / country site</Text>
         </Pressable>
 
         <Pressable style={styles.gridCard} onPress={handleTravellingDuty}>
-          <Text style={styles.gridEmoji}>✈️</Text>
           <Text style={styles.gridTitle}>Travelling Duty</Text>
           <Text style={styles.gridSubtitle}>$50 / country site</Text>
         </Pressable>
@@ -308,7 +303,6 @@ export default function DashboardScreen() {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <View style={styles.dutyHeader}>
-                <Text style={styles.dutyEmoji}>{activeDutyModal.icon}</Text>
                 <View>
                   <Text style={styles.dutyTitle}>{activeDutyModal.title}</Text>
                   <Text style={styles.dutySub}>{activeDutyModal.subtitle}</Text>
@@ -353,7 +347,7 @@ export default function DashboardScreen() {
                 {currentPlayer.balance < activeDutyModal.amount && (
                   <View style={styles.errorBox}>
                     <Text style={styles.errorText}>
-                      ⚠️ Insufficient Funds! You need $${activeDutyModal.amount.toLocaleString()} but only have $${currentPlayer.balance.toLocaleString()}.
+                      [WARNING] Insufficient Funds! You need $${activeDutyModal.amount.toLocaleString()} but only have $${currentPlayer.balance.toLocaleString()}.
                     </Text>
                   </View>
                 )}

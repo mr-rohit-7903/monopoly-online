@@ -21,7 +21,7 @@ export default function BankerPanelScreen() {
   if (!isBanker) {
     return (
       <View style={styles.centerContainer}>
-        <Text style={styles.restrictedText}>🔒 Restricted Screen</Text>
+        <Text style={styles.restrictedText}>Restricted Screen</Text>
         <Text style={styles.restrictedSub}>Only the designated Banker can access this control panel.</Text>
       </View>
     );
@@ -45,7 +45,7 @@ export default function BankerPanelScreen() {
         receiverId: targetPlayerId,
         amount: val,
         reason: `Banker Grant: ${reason}`,
-        icon: '👑',
+        icon: 'BANK',
       });
       setAmount('');
       Alert.alert('Success', `Granted $${val.toLocaleString()} from Bank.`);
@@ -74,7 +74,7 @@ export default function BankerPanelScreen() {
         senderId: targetPlayerId,
         amount: val,
         reason: `Banker Penalty: ${reason}`,
-        icon: '⚠️',
+        icon: 'FINE',
       });
       setAmount('');
       Alert.alert('Success', `Fined player $${val.toLocaleString()} to Bank.`);
@@ -88,7 +88,7 @@ export default function BankerPanelScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.banner}>
-        <Text style={styles.bannerTitle}>🏦 Banker Control Panel</Text>
+        <Text style={styles.bannerTitle}>Banker Control Panel</Text>
         <Text style={styles.bannerSub}>
           As the Banker, you have administrative authority to grant funds, charge fines, and manage game assets.
         </Text>
@@ -131,7 +131,6 @@ export default function BankerPanelScreen() {
         <View style={styles.buttonGroup}>
           <Button
             title="Grant Funds"
-            icon="💵"
             variant="emerald"
             loading={loading}
             onPress={handleGrantMoney}
@@ -139,7 +138,6 @@ export default function BankerPanelScreen() {
           />
           <Button
             title="Charge Fine"
-            icon="⚠️"
             variant="danger"
             loading={loading}
             onPress={handleFinePlayer}

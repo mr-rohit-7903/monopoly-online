@@ -16,7 +16,7 @@ export default function JoinGameScreen() {
 
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
-  const [avatar, setAvatar] = useState('🚗');
+  const [avatar, setAvatar] = useState('P2');
   const [color, setColor] = useState('#3B82F6');
 
   const handleJoin = async () => {
@@ -91,7 +91,6 @@ export default function JoinGameScreen() {
         <View style={styles.footer}>
           <Button
             title="Join Room"
-            icon="🎮"
             size="lg"
             loading={isLoading}
             onPress={handleJoin}

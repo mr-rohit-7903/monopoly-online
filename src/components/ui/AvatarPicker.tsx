@@ -87,7 +87,9 @@ const styles = StyleSheet.create({
     borderWidth: 3,
   },
   avatarText: {
-    fontSize: 24,
+    fontSize: 14,
+    fontWeight: '800',
+    color: COLORS.textPrimary,
   },
   colorDot: {
     width: 36,

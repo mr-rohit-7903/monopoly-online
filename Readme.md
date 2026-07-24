@@ -137,17 +137,17 @@ Whenever a transaction occurs, all players currently in the game should immediat
 
 Examples:
 
-- 💸 John paid Sarah $1,200 (Rent)
-- 🏦 Bank paid Mike $1,500 (GO Salary)
-- 🎉 Party House: You collected $200 from each player.
-- 🏠 Sarah purchased Japan.
-- ⚠️ You paid $2,500 to the Bank (Insurance Premium).
+- John paid Sarah $1,200 (Rent)
+- Bank paid Mike $1,500 (GO Salary)
+- Party House: You collected $200 from each player.
+- Sarah purchased Japan.
+- You paid $2,500 to the Bank (Insurance Premium).
 
-🟢 Bank → Alex      +$1,500    GO Salary
-🔴 Alex → Sarah     -$1,200    Rent
-🟢 Sarah bought Japan
-🟡 Mike mortgaged Canada
-🔵 Bank charged Custom Duty
+Bank -> Alex      +$1,500    GO Salary
+Alex -> Sarah     -$1,200    Rent
+Sarah bought Japan
+Mike mortgaged Canada
+Bank charged Custom Duty
 
 Notifications should:
 

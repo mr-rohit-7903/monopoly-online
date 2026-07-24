@@ -24,7 +24,7 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set, get) => ({
   userId: storage.getItem(STORAGE_KEYS.USER_ID),
   userName: storage.getItem(STORAGE_KEYS.USER_NAME) || '',
-  userAvatar: storage.getItem(STORAGE_KEYS.USER_AVATAR) || '🎩',
+  userAvatar: storage.getItem(STORAGE_KEYS.USER_AVATAR) || 'P1',
   userColor: storage.getItem(STORAGE_KEYS.USER_COLOR) || '#3B82F6',
   isAuthenticating: false,
 

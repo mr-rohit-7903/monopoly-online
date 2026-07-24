@@ -33,7 +33,7 @@ export default function PayTerminalScreen() {
   }
 
   const recipients = [
-    { id: 'BANK', name: '🏦 Bank', color: COLORS.emerald },
+    { id: 'BANK', name: 'Bank', color: COLORS.emerald },
     ...players.filter((p) => p.id !== currentPlayer.id).map((p) => ({
       id: p.id,
       name: `${p.avatar} ${p.name}`,
@@ -61,7 +61,7 @@ export default function PayTerminalScreen() {
           senderId: currentPlayer.id,
           amount: numAmount,
           reason: reason.trim() || 'Bank Collection',
-          icon: '🏦',
+          icon: 'BANK',
         });
       } else {
         await payPlayerToPlayer({
@@ -71,7 +71,7 @@ export default function PayTerminalScreen() {
           amount: numAmount,
           reason: reason.trim() || 'Rent',
           category: 'p2p',
-          icon: '💸',
+          icon: 'PAY',
         });
       }
       soundEngine.playCashSound();
@@ -88,14 +88,14 @@ export default function PayTerminalScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.topActionsRow}>
         <Button
-          title="🎴 Draw Chance Card"
+          title="Draw Chance Card"
           variant="gold"
           size="md"
           onPress={() => setCardModalVisible(true)}
           style={{ flex: 1 }}
         />
         <Button
-          title="🤝 Trade & Swap"
+          title="Trade & Swap"
           variant="secondary"
           size="md"
           onPress={() => setTradeModalVisible(true)}
@@ -150,7 +150,6 @@ export default function PayTerminalScreen() {
 
         <Button
           title={`Pay $${amount ? parseInt(amount, 10).toLocaleString() : '0'}`}
-          icon="💸"
           size="lg"
           variant="gold"
           loading={loading}

@@ -28,7 +28,7 @@ export const QuickPayModal: React.FC<QuickPayModalProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
 
   const availableReceivers = [
-    { id: 'BANK', name: '🏦 Bank', avatar: '🏦', color: COLORS.emerald },
+    { id: 'BANK', name: 'Bank', avatar: 'BANK', color: COLORS.emerald },
     ...players.filter((p) => p.id !== currentPlayer.id).map((p) => ({
       id: p.id,
       name: p.name,
@@ -69,7 +69,7 @@ export const QuickPayModal: React.FC<QuickPayModalProps> = ({
       <View style={styles.overlay}>
         <View style={styles.modalCard}>
           <View style={styles.header}>
-            <Text style={styles.title}>💸 Send Payment</Text>
+            <Text style={styles.title}>Send Payment</Text>
             <Pressable onPress={onClose} style={styles.closeBtn}>
               <Text style={styles.closeText}>✕</Text>
             </Pressable>

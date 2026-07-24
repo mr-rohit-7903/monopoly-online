@@ -106,10 +106,10 @@ export function TradeModal({
         gameId,
         senderId: currentPlayer.id,
         senderName: currentPlayer.name,
-        senderAvatar: currentPlayer.avatar,
+        senderAvatar: currentPlayer.avatar || 'P1',
         receiverId: partnerPlayer.id,
         receiverName: partnerPlayer.name,
-        receiverAvatar: partnerPlayer.avatar,
+        receiverAvatar: partnerPlayer.avatar || 'P2',
         senderCash: numOfferCash,
         senderPropertyIds: selectedOfferPropIds,
         receiverCash: numRequestCash,
@@ -118,7 +118,7 @@ export function TradeModal({
 
       soundEngine.playCashSound();
       onClose();
-      Alert.alert('🤝 Trade Proposed!', `Trade deal sent to ${partnerPlayer.name}. They will be notified to review & accept.`);
+      Alert.alert('Trade Proposed!', `Trade deal sent to ${partnerPlayer.name}. They will be notified to review & accept.`);
     } catch (err: any) {
       setErrorMsg(err?.message || 'Failed to send trade proposal.');
     } finally {
@@ -136,7 +136,6 @@ export function TradeModal({
           {/* Modal Header */}
           <View style={styles.header}>
             <View style={styles.titleRow}>
-              <Text style={styles.headerEmoji}>🤝</Text>
               <View>
                 <Text style={styles.title}>Propose Trade & Swap</Text>
                 <Text style={styles.subtitle}>Negotiate cash and unbuilt deeds with any player</Text>
@@ -178,7 +177,7 @@ export function TradeModal({
               <>
                 {/* ─── OFFER SECTION (You Give) ─── */}
                 <View style={styles.tradeBox}>
-                  <Text style={styles.boxTitle}>🟢 YOU GIVE ({currentPlayer.name})</Text>
+                  <Text style={styles.boxTitle}>YOU GIVE ({currentPlayer.name})</Text>
 
                   <Input
                     label="Offer Cash ($)"
@@ -211,7 +210,7 @@ export function TradeModal({
                             onPress={() => toggleOfferProp(deed.id)}
                           >
                             <Text style={styles.deedChipText}>
-                              {isChecked ? '✅ ' : ''}{deed.name} (${deed.purchasePrice})
+                              {isChecked ? '[SELECTED] ' : ''}{deed.name} (${deed.purchasePrice})
                             </Text>
                           </Pressable>
                         );
@@ -222,7 +221,7 @@ export function TradeModal({
 
                 {/* ─── REQUEST SECTION (You Receive) ─── */}
                 <View style={styles.tradeBox}>
-                  <Text style={styles.boxTitle}>🔵 YOU RECEIVE (From {partnerPlayer.name})</Text>
+                  <Text style={styles.boxTitle}>YOU RECEIVE (From {partnerPlayer.name})</Text>
 
                   <Input
                     label="Request Cash ($)"
@@ -255,7 +254,7 @@ export function TradeModal({
                             onPress={() => toggleRequestProp(deed.id)}
                           >
                             <Text style={styles.deedChipText}>
-                              {isChecked ? '✅ ' : ''}{deed.name} (${deed.purchasePrice})
+                              {isChecked ? '[SELECTED] ' : ''}{deed.name} (${deed.purchasePrice})
                             </Text>
                           </Pressable>
                         );
@@ -266,7 +265,7 @@ export function TradeModal({
 
                 {errorMsg && (
                   <View style={styles.errorBox}>
-                    <Text style={styles.errorText}>⚠️ {errorMsg}</Text>
+                    <Text style={styles.errorText}>[WARNING] {errorMsg}</Text>
                   </View>
                 )}
               </>
@@ -280,7 +279,7 @@ export function TradeModal({
           <View style={styles.footer}>
             <Button title="Cancel" variant="secondary" onPress={onClose} disabled={loading} />
             <Button
-              title="🤝 Send Trade Proposal"
+              title="Send Trade Proposal"
               variant="gold"
               loading={loading}
               disabled={!partnerPlayer}

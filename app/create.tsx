@@ -15,7 +15,7 @@ export default function CreateGameScreen() {
   const { createGame, isLoading, error } = useGameStore();
 
   const [name, setName] = useState('');
-  const [avatar, setAvatar] = useState('🎩');
+  const [avatar, setAvatar] = useState('P1');
   const [color, setColor] = useState('#EF4444');
 
   const handleCreate = async () => {
@@ -74,7 +74,6 @@ export default function CreateGameScreen() {
         <View style={styles.footer}>
           <Button
             title="Create Game Session"
-            icon="👑"
             size="lg"
             loading={isLoading}
             onPress={handleCreate}
