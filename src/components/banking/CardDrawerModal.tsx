@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Modal, Pressable, ScrollView, Alert } from 'react-native';
+import { StyleSheet, Text, View, Modal, Pressable, ScrollView, Alert, TextInput } from 'react-native';
 import { CHANCE_CARDS, COMMUNITY_CHEST_CARDS } from '../../constants/cardsRegistry';
 import { COLORS, RADIUS, SPACING } from '../../constants/theme';
 import { Button } from '../ui/Button';
@@ -28,16 +28,18 @@ export const CardDrawerModal: React.FC<CardDrawerModalProps> = ({
   currentPlayer,
 }) => {
   const { colors } = useThemeStore();
-  const [deckType, setDeckType] = useState<'chance' | 'community_chest'>('chance');
-  const [selectedCard, setSelectedCard] = useState<GameCard | null>(null);
+  const [deckType, setDeckType] = useState<'chance' | 'uno'>('chance');
+  const [numberInput, setNumberInput] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
   const cards = deckType === 'chance' ? CHANCE_CARDS : COMMUNITY_CHEST_CARDS;
+  const numValue = parseInt(numberInput.trim(), 10);
+  const selectedCard: GameCard | null =
+    !isNaN(numValue) ? cards.find((c) => c.diceNumber === numValue) || null : null;
 
-  const handleDrawRandom = () => {
+  const handleSelectNumber = (num: number) => {
     soundEngine.playDiceSound();
-    const randomIndex = Math.floor(Math.random() * cards.length);
-    setSelectedCard(cards[randomIndex]);
+    setNumberInput(num.toString());
   };
 
   const handleExecuteCard = async () => {
@@ -50,7 +52,7 @@ export const CardDrawerModal: React.FC<CardDrawerModalProps> = ({
           gameId,
           senderId: currentPlayer.id,
           amount: selectedCard.amount,
-          reason: `Card: ${selectedCard.title}`,
+          reason: `Card (${deckType.toUpperCase()} #${selectedCard.diceNumber}): ${selectedCard.title}`,
           icon: 'CARD',
         });
       } else if (selectedCard.action === 'receive_bank' && selectedCard.amount) {
@@ -58,7 +60,7 @@ export const CardDrawerModal: React.FC<CardDrawerModalProps> = ({
           gameId,
           receiverId: currentPlayer.id,
           amount: selectedCard.amount,
-          reason: `Card: ${selectedCard.title}`,
+          reason: `Card (${deckType.toUpperCase()} #${selectedCard.diceNumber}): ${selectedCard.title}`,
           icon: 'CARD',
         });
       } else if (selectedCard.action === 'collect_all' && selectedCard.amount) {
@@ -66,7 +68,7 @@ export const CardDrawerModal: React.FC<CardDrawerModalProps> = ({
           gameId,
           receiverId: currentPlayer.id,
           amountPerPlayer: selectedCard.amount,
-          reason: `Card: ${selectedCard.title}`,
+          reason: `Card (${deckType.toUpperCase()} #${selectedCard.diceNumber}): ${selectedCard.title}`,
           icon: 'PARTY',
         });
       } else if (selectedCard.action === 'go_to_jail') {
@@ -76,7 +78,7 @@ export const CardDrawerModal: React.FC<CardDrawerModalProps> = ({
       }
 
       setLoading(false);
-      setSelectedCard(null);
+      setNumberInput('');
       onClose();
     } catch (err: any) {
       setLoading(false);
@@ -89,70 +91,88 @@ export const CardDrawerModal: React.FC<CardDrawerModalProps> = ({
       <View style={styles.overlay}>
         <View style={[styles.modalCard, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
           <View style={styles.header}>
-            <Text style={[styles.title, { color: colors.textPrimary }]}>Chance & Community Chest</Text>
+            <Text style={[styles.title, { color: colors.textPrimary }]}>Draw Card (Chance & Uno)</Text>
             <Pressable onPress={onClose} style={styles.closeBtn}>
               <Text style={[styles.closeText, { color: colors.textMuted }]}>✕</Text>
             </Pressable>
           </View>
 
-          {/* Deck selector */}
+          {/* STEP 1: Select Deck (Chance vs Uno) */}
+          <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>1. Select Deck Type</Text>
           <View style={styles.deckToggle}>
             <Pressable
               style={[styles.deckBtn, deckType === 'chance' && styles.deckActive]}
-              onPress={() => {
-                setDeckType('chance');
-                setSelectedCard(null);
-              }}
+              onPress={() => setDeckType('chance')}
             >
               <Text style={[styles.deckBtnText, deckType === 'chance' && styles.deckTextActive]}>
-                Chance Deck
+                Chance
               </Text>
             </Pressable>
             <Pressable
-              style={[styles.deckBtn, deckType === 'community_chest' && styles.deckActive]}
-              onPress={() => {
-                setDeckType('community_chest');
-                setSelectedCard(null);
-              }}
+              style={[styles.deckBtn, deckType === 'uno' && styles.deckActive]}
+              onPress={() => setDeckType('uno')}
             >
-              <Text style={[styles.deckBtnText, deckType === 'community_chest' && styles.deckTextActive]}>
-                Community Chest
+              <Text style={[styles.deckBtnText, deckType === 'uno' && styles.deckTextActive]}>
+                Uno
               </Text>
             </Pressable>
           </View>
 
-          <Button
-            title="Draw Card by Dice Roll"
-            variant="gold"
-            size="md"
-            onPress={handleDrawRandom}
-            style={{ marginBottom: SPACING.md }}
+          {/* STEP 2: Write / Enter Card Number */}
+          <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>2. Write Card Number (2 - 12)</Text>
+          <TextInput
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.background,
+                color: colors.textPrimary,
+                borderColor: colors.surfaceBorder,
+              },
+            ]}
+            placeholder="Type card number (e.g. 7)"
+            placeholderTextColor={colors.textMuted}
+            keyboardType="number-pad"
+            maxLength={2}
+            value={numberInput}
+            onChangeText={setNumberInput}
           />
 
-          {/* Card Grid / List */}
-          <ScrollView style={styles.cardsList} horizontal showsHorizontalScrollIndicator={false}>
-            {cards.map((c) => {
-              const isSelected = selectedCard?.id === c.id;
+          {/* Quick Select Number Chips */}
+          <View style={styles.quickChipsRow}>
+            {[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => {
+              const isSelected = numValue === n;
               return (
                 <Pressable
-                  key={c.id}
-                  style={[styles.cardChip, isSelected && styles.cardChipSelected]}
-                  onPress={() => setSelectedCard(c)}
+                  key={n}
+                  style={[
+                    styles.numChip,
+                    { backgroundColor: colors.background, borderColor: colors.surfaceBorder },
+                    isSelected && { backgroundColor: colors.primary, borderColor: colors.primary },
+                  ]}
+                  onPress={() => handleSelectNumber(n)}
                 >
-                  <Text style={styles.diceBadge}>Dice #{c.diceNumber}</Text>
-                  <Text style={styles.cardChipTitle}>{c.title}</Text>
+                  <Text style={[styles.numChipText, { color: isSelected ? '#FFFFFF' : colors.textPrimary }]}>
+                    #{n}
+                  </Text>
                 </Pressable>
               );
             })}
-          </ScrollView>
+          </View>
 
-          {/* Selected Card View */}
-          {selectedCard && (
-            <View style={styles.selectedCardBox}>
-              <Text style={styles.cardHeaderTitle}>{selectedCard.title}</Text>
-              <Text style={styles.cardDesc}>{selectedCard.description}</Text>
-              <View style={styles.effectBadge}>
-                <Text style={styles.effectText}>Effect: {selectedCard.effectText}</Text>
+          {/* Preview Selected Card */}
+          {selectedCard ? (
+            <View style={[styles.selectedCardBox, { backgroundColor: colors.background, borderColor: colors.surfaceBorder }]}>
+              <View style={styles.cardHeaderRow}>
+                <Text style={[styles.cardHeaderTitle, { color: colors.textPrimary }]}>{selectedCard.title}</Text>
+                <View style={[styles.cardBadge, { backgroundColor: colors.gold + '22', borderColor: colors.gold }]}>
+                  <Text style={[styles.cardBadgeText, { color: colors.gold }]}>Card #{selectedCard.diceNumber}</Text>
+                </View>
+              </View>
+
+              <Text style={[styles.cardDesc, { color: colors.textSecondary }]}>{selectedCard.description}</Text>
+
+              <View style={[styles.effectBadge, { backgroundColor: colors.emerald + '15', borderColor: colors.emerald }]}>
+                <Text style={[styles.effectText, { color: colors.emerald }]}>Effect: {selectedCard.effectText}</Text>
               </View>
 
               <Button
@@ -164,7 +184,13 @@ export const CardDrawerModal: React.FC<CardDrawerModalProps> = ({
                 style={{ marginTop: SPACING.md }}
               />
             </View>
-          )}
+          ) : numberInput.trim().length > 0 ? (
+            <View style={[styles.emptyBox, { borderColor: colors.surfaceBorder }]}>
+              <Text style={[styles.emptyText, { color: colors.textMuted }]}>
+                No card found for number #{numberInput}. Enter a number between 2 and 12.
+              </Text>
+            </View>
+          ) : null}
         </View>
       </View>
     </Modal>
@@ -182,7 +208,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: RADIUS.xl,
     borderTopRightRadius: RADIUS.xl,
     padding: SPACING.lg,
-    maxHeight: '85%',
+    maxHeight: '90%',
     borderTopWidth: 1,
     borderColor: COLORS.surfaceBorder,
   },
@@ -205,6 +231,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
+  sectionLabel: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.xs,
+    marginTop: SPACING.xs,
+  },
   deckToggle: {
     flexDirection: 'row',
     backgroundColor: COLORS.surfaceLight,
@@ -222,70 +255,89 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   deckBtnText: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: '800',
     color: COLORS.textSecondary,
   },
   deckTextActive: {
     color: '#FFFFFF',
   },
-  cardsList: {
-    maxHeight: 90,
+  input: {
+    height: 48,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    paddingHorizontal: SPACING.md,
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: SPACING.sm,
+  },
+  quickChipsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
     marginBottom: SPACING.md,
   },
-  cardChip: {
-    backgroundColor: COLORS.surfaceLight,
-    borderRadius: RADIUS.md,
-    padding: SPACING.md,
-    marginRight: SPACING.sm,
-    width: 140,
-    borderWidth: 2,
-    borderColor: COLORS.surfaceBorder,
+  numChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: RADIUS.sm,
+    borderWidth: 1,
   },
-  cardChipSelected: {
-    borderColor: COLORS.gold,
-    backgroundColor: COLORS.surfaceBorder,
-  },
-  diceBadge: {
-    fontSize: 10,
+  numChipText: {
+    fontSize: 12,
     fontWeight: '800',
-    color: COLORS.gold,
-    textTransform: 'uppercase',
-  },
-  cardChipTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
-    marginTop: 4,
   },
   selectedCardBox: {
-    backgroundColor: COLORS.background,
     borderRadius: RADIUS.md,
     padding: SPACING.lg,
     borderWidth: 1,
-    borderColor: COLORS.surfaceBorder,
+    marginTop: SPACING.xs,
+  },
+  cardHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
   },
   cardHeaderTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: COLORS.textPrimary,
+    flex: 1,
+  },
+  cardBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: RADIUS.sm,
+    borderWidth: 1,
+  },
+  cardBadgeText: {
+    fontSize: 11,
+    fontWeight: '800',
   },
   cardDesc: {
     fontSize: 14,
-    color: COLORS.textSecondary,
     marginTop: 4,
+    lineHeight: 20,
   },
   effectBadge: {
-    backgroundColor: COLORS.gold + '22',
     padding: SPACING.md,
     borderRadius: RADIUS.md,
     marginTop: SPACING.md,
     borderWidth: 1,
-    borderColor: COLORS.gold,
   },
   effectText: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.gold,
+  },
+  emptyBox: {
+    padding: SPACING.md,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    alignItems: 'center',
+    marginTop: SPACING.xs,
+  },
+  emptyText: {
+    fontSize: 13,
+    fontStyle: 'italic',
   },
 });
