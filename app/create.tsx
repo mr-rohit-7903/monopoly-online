@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS, RADIUS, SPACING } from '../src/constants/theme';
+import { COLORS, PLAYER_AVATARS, PLAYER_COLORS, RADIUS, SPACING } from '../src/constants/theme';
 import { Input } from '../src/components/ui/Input';
 import { Button } from '../src/components/ui/Button';
 import { AvatarPicker } from '../src/components/ui/AvatarPicker';
@@ -17,8 +17,8 @@ export default function CreateGameScreen() {
   const { colors } = useThemeStore();
 
   const [name, setName] = useState('');
-  const [avatar, setAvatar] = useState('P1');
-  const [color, setColor] = useState('#5588ff');
+  const [avatar, setAvatar] = useState(PLAYER_AVATARS[0]);
+  const [color, setColor] = useState(PLAYER_COLORS[0]);
 
   const handleCreate = async () => {
     if (!name.trim()) {

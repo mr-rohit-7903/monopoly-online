@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, ScrollView, Pressable, Modal } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, RADIUS, SPACING } from '../../src/constants/theme';
 import { Button } from '../../src/components/ui/Button';
+import { PlayerAvatar } from '../../src/components/ui/PlayerAvatar';
 import { QuickPayModal } from '../../src/components/banking/QuickPayModal';
 import { useAuthStore } from '../../src/store/useAuthStore';
 import { useGameStore } from '../../src/store/useGameStore';
@@ -216,9 +217,7 @@ export default function DashboardScreen() {
       {/* Main Player Ledger Card */}
       <View style={[styles.heroLedger, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
         <View style={styles.playerHeader}>
-          <View style={[styles.playerAvatarBg, { backgroundColor: colors.surfaceLight }]}>
-            <Text style={[styles.avatarText, { color: colors.textPrimary }]}>{currentPlayer.avatar}</Text>
-          </View>
+          <PlayerAvatar avatar={currentPlayer.avatar} size={48} borderRadius={RADIUS.md} />
           <View>
             <Text style={[styles.welcomeText, { color: colors.textMuted }]}>Logged in as</Text>
             <Text style={[styles.playerName, { color: colors.textPrimary }]}>{currentPlayer.name}</Text>
@@ -297,7 +296,7 @@ export default function DashboardScreen() {
               <View key={p.id} style={[styles.leaderItem, isMe && { backgroundColor: colors.surfaceLight }]}>
                 <View style={styles.rankCol}>
                   <Text style={[styles.rankText, { color: colors.primary }]}>#{idx + 1}</Text>
-                  <Text style={styles.pAvatar}>{p.avatar}</Text>
+                  <PlayerAvatar avatar={p.avatar} size={28} borderRadius={RADIUS.sm} />
                   <Text style={[styles.pName, { color: colors.textPrimary }]}>
                     {p.name} {isMe ? '(You)' : ''}
                   </Text>

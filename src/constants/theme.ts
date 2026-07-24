@@ -46,16 +46,21 @@ export const RADIUS = {
 };
 
 export const PLAYER_COLORS = [
-  '#5588ff', // Royal Blue (85,136,255)
-  '#77aaff', // Light Blue (119,170,255)
-  '#99ccff', // Sky Blue (153,204,255)
-  '#bbeeff', // Ice Blue (187,238,255)
-  '#3366ff', // Deep Blue (51,102,255)
-  '#10B981', // Emerald
-  '#F97316', // Orange
-  '#EF4444', // Crimson
+  '#EF4444', // Red
+  '#3B82F6', // Blue
+  '#10B981', // Green
+  '#EAB308', // Yellow
+  '#EC4899', // Pink
 ];
 
 export const PLAYER_AVATARS = [
-  'P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'VIP', 'PRO', 'MAX', 'ACE'
+  'rohit', 'Ayush', 'Sumit', 'Baibhab', 'Himanshu'
 ];
+
+export const AVATAR_MAP: Record<string, any> = {
+  rohit: require('../public/avatar/rohit.jpg'),
+  Ayush: require('../public/avatar/Ayush.jpeg'),
+  Sumit: require('../public/avatar/Sumit.jpeg'),
+  Baibhab: require('../public/avatar/Baibhab.jpeg'),
+  Himanshu: require('../public/avatar/Himanshu.jpeg'),
+};

@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, Pressable, ScrollView } from 'react-native';
 import { COLORS, PLAYER_AVATARS, PLAYER_COLORS, RADIUS, SPACING } from '../../constants/theme';
+import { PlayerAvatar } from './PlayerAvatar';
 
 interface AvatarPickerProps {
   selectedAvatar: string;
@@ -31,7 +32,7 @@ export const AvatarPicker: React.FC<AvatarPickerProps> = ({
               ]}
               onPress={() => onSelectAvatar(avatar)}
             >
-              <Text style={styles.avatarText}>{avatar}</Text>
+              <PlayerAvatar avatar={avatar} size={42} borderRadius={RADIUS.md} />
             </Pressable>
           );
         })}

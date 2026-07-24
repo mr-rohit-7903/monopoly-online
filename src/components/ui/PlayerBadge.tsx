@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View, Pressable } from 'react-native';
 import { Player } from '../../types/game';
 import { COLORS, RADIUS, SPACING } from '../../constants/theme';
+import { PlayerAvatar } from './PlayerAvatar';
 import { useThemeStore } from '../../store/useThemeStore';
 
 interface PlayerBadgeProps {
@@ -36,9 +37,7 @@ export const PlayerBadge: React.FC<PlayerBadgeProps> = ({
       disabled={!onPress}
     >
       <View style={styles.leftSection}>
-        <View style={[styles.avatarCircle, { backgroundColor: player.color + '33' }]}>
-          <Text style={[styles.avatarEmoji, { color: colors.textPrimary }]}>{player.avatar}</Text>
-        </View>
+        <PlayerAvatar avatar={player.avatar} size={38} borderRadius={RADIUS.md} />
         <View>
           <View style={styles.nameRow}>
             <Text style={[styles.playerName, { color: colors.textPrimary }]}>{player.name}</Text>

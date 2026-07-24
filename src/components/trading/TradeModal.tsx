@@ -4,6 +4,7 @@ import {
   Modal, Pressable, ActivityIndicator, Alert, ImageBackground,
 } from 'react-native';
 import { COLORS, RADIUS, SPACING } from '../../constants/theme';
+import { PlayerAvatar } from '../ui/PlayerAvatar';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Player } from '../../types/game';
@@ -173,7 +174,7 @@ export function TradeModal({
                       setSelectedRequestPropIds([]);
                     }}
                   >
-                    <Text style={[styles.partnerEmoji, { color: colors.textPrimary }]}>{p.avatar}</Text>
+                    <PlayerAvatar avatar={p.avatar} size={32} borderRadius={RADIUS.sm} />
                     <Text style={[styles.partnerName, { color: colors.textPrimary }]}>{p.name}</Text>
                   </Pressable>
                 );

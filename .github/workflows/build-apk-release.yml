@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-and-release:
-    name: Build Android APKs & Create Release
+    name: Build Android APK & Create Release
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -43,36 +43,21 @@ jobs:
       - name: 7. Make gradlew executable
         run: chmod +x android/gradlew
 
-      - name: 8. Build Android Release APKs (4 ABI splits + Universal)
+      - name: 8. Build Android Release APK (Modern 64-bit CPUs - Low Size)
         run: |
           cd android
           ./gradlew assembleRelease --no-daemon
 
-      - name: 9. Organize and Rename Release APKs
+      - name: 9. Organize and Rename Release APK
         run: |
           mkdir -p release_apks
           APK_DIR="android/app/build/outputs/apk/release"
 
-          # Universal APK
-          if [ -f "$APK_DIR/app-universal-release.apk" ]; then
-            cp "$APK_DIR/app-universal-release.apk" release_apks/Monopoly-Banking-v1.0.0-universal.apk
-          elif [ -f "$APK_DIR/app-release.apk" ]; then
-            cp "$APK_DIR/app-release.apk" release_apks/Monopoly-Banking-v1.0.0-universal.apk
-          fi
-
-          # ARM 64-bit APK
+          # Modern 64-bit ARM CPUs (arm64-v8a) - Optimized low file size
           if [ -f "$APK_DIR/app-arm64-v8a-release.apk" ]; then
             cp "$APK_DIR/app-arm64-v8a-release.apk" release_apks/Monopoly-Banking-v1.0.0-arm64-v8a.apk
-          fi
-
-          # ARM 32-bit APK
-          if [ -f "$APK_DIR/app-armeabi-v7a-release.apk" ]; then
-            cp "$APK_DIR/app-armeabi-v7a-release.apk" release_apks/Monopoly-Banking-v1.0.0-armeabi-v7a.apk
-          fi
-
-          # x86 64-bit APK
-          if [ -f "$APK_DIR/app-x86_64-release.apk" ]; then
-            cp "$APK_DIR/app-x86_64-release.apk" release_apks/Monopoly-Banking-v1.0.0-x86_64.apk
+          elif [ -f "$APK_DIR/app-release.apk" ]; then
+            cp "$APK_DIR/app-release.apk" release_apks/Monopoly-Banking-v1.0.0-arm64-v8a.apk
           fi
 
           echo "Organized APKs:"
@@ -86,18 +71,12 @@ jobs:
           body: |
             ## 🎮 Monopoly Banking v1.0.0 Release
             
-            Official release of **Monopoly Banking** Android application with real-time multiplayer, dynamic themes, Title Deed tickets, and Chance & Uno cards.
+            Official release of **Monopoly Banking** Android application.
             
-            ### 📱 Downloads (4 APK Variants):
-            1. **`Monopoly-Banking-v1.0.0-universal.apk`**: Universal APK (Recommended - compatible with all Android devices).
-            2. **`Monopoly-Banking-v1.0.0-arm64-v8a.apk`**: Optimized for modern 64-bit ARM smartphones.
-            3. **`Monopoly-Banking-v1.0.0-armeabi-v7a.apk`**: Optimized for older 32-bit ARM smartphones.
-            4. **`Monopoly-Banking-v1.0.0-x86_64.apk`**: Optimized for 64-bit Android emulators & x86 tablets.
+            ### 📱 Download (Modern 64-bit CPU Optimized - Low Size):
+            - **`Monopoly-Banking-v1.0.0-arm64-v8a.apk`**: Lightweight build optimized for modern 64-bit ARM Android devices.
           files: |
-            release_apks/Monopoly-Banking-v1.0.0-universal.apk
             release_apks/Monopoly-Banking-v1.0.0-arm64-v8a.apk
-            release_apks/Monopoly-Banking-v1.0.0-armeabi-v7a.apk
-            release_apks/Monopoly-Banking-v1.0.0-x86_64.apk
           draft: false
           prerelease: false
         env:

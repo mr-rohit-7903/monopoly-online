@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, Modal, Pressable, ScrollView, Alert } from 'react-native';
 import { Player } from '../../types/game';
 import { COLORS, RADIUS, SPACING } from '../../constants/theme';
+import { PlayerAvatar } from '../ui/PlayerAvatar';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 
@@ -90,7 +91,7 @@ export const QuickPayModal: React.FC<QuickPayModalProps> = ({
                     ]}
                     onPress={() => setSelectedReceiverId(rec.id)}
                   >
-                    <Text style={styles.recipientAvatar}>{rec.avatar}</Text>
+                    <PlayerAvatar avatar={rec.avatar} size={32} borderRadius={RADIUS.sm} />
                     <Text style={styles.recipientName}>{rec.name}</Text>
                   </Pressable>
                 );
