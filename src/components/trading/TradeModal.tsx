@@ -151,7 +151,7 @@ export function TradeModal({
           <ScrollView style={styles.scrollBody} contentContainerStyle={{ padding: SPACING.md }}>
 
             {/* Select Partner Player */}
-            <Text style={styles.sectionLabel}>1. Select Trading Partner</Text>
+            <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>1. Select Trading Partner</Text>
             <View style={styles.partnerRow}>
               {otherPlayers.map((p) => {
                 const isSelected = selectedPartnerId === p.id;
@@ -160,7 +160,7 @@ export function TradeModal({
                     key={p.id}
                     style={[
                       styles.partnerChip,
-                      isSelected && styles.partnerSelected,
+                      { backgroundColor: isSelected ? colors.surfaceBorder : colors.background, borderColor: colors.surfaceBorder },
                       isSelected && { borderColor: p.color },
                     ]}
                     onPress={() => {
@@ -168,8 +168,8 @@ export function TradeModal({
                       setSelectedRequestPropIds([]);
                     }}
                   >
-                    <Text style={styles.partnerEmoji}>{p.avatar}</Text>
-                    <Text style={styles.partnerName}>{p.name}</Text>
+                    <Text style={[styles.partnerEmoji, { color: colors.textPrimary }]}>{p.avatar}</Text>
+                    <Text style={[styles.partnerName, { color: colors.textPrimary }]}>{p.name}</Text>
                   </Pressable>
                 );
               })}
@@ -178,8 +178,8 @@ export function TradeModal({
             {partnerPlayer ? (
               <>
                 {/* ─── OFFER SECTION (You Give) ─── */}
-                <View style={styles.tradeBox}>
-                  <Text style={styles.boxTitle}>YOU GIVE ({currentPlayer.name})</Text>
+                <View style={[styles.tradeBox, { backgroundColor: colors.background, borderColor: colors.surfaceBorder }]}>
+                  <Text style={[styles.boxTitle, { color: colors.textPrimary }]}>YOU GIVE ({currentPlayer.name})</Text>
 
                   <Input
                     label="Offer Cash ($)"
@@ -190,28 +190,28 @@ export function TradeModal({
                     style={styles.amountInput}
                   />
 
-                  <Text style={styles.subLabel}>Select Unbuilt Deeds to Offer:</Text>
+                  <Text style={[styles.subLabel, { color: colors.textMuted }]}>Select Unbuilt Deeds to Offer:</Text>
                   {myEligibleProps.length === 0 ? (
-                    <Text style={styles.noPropsText}>No unbuilt properties available to trade</Text>
+                    <Text style={[styles.noPropsText, { color: colors.textMuted }]}>No unbuilt properties available to trade</Text>
                   ) : (
                     <View style={styles.deedGrid}>
                       {myEligibleProps.map((p) => {
                         const deed = BOARD_PROPERTIES.find((b) => b.id === p.propertyId);
                         if (!deed) return null;
                         const isChecked = selectedOfferPropIds.includes(deed.id);
-                        const groupColor = GROUP_COLORS[deed.group] || COLORS.primary;
+                        const groupColor = GROUP_COLORS[deed.group] || colors.primary;
 
                         return (
                           <Pressable
                             key={deed.id}
                             style={[
                               styles.deedChip,
-                              { borderLeftColor: groupColor },
-                              isChecked && styles.deedChipChecked,
+                              { backgroundColor: colors.surface, borderColor: colors.surfaceBorder, borderLeftColor: groupColor },
+                              isChecked && { backgroundColor: colors.emerald + '22', borderColor: colors.emerald },
                             ]}
                             onPress={() => toggleOfferProp(deed.id)}
                           >
-                            <Text style={styles.deedChipText}>
+                            <Text style={[styles.deedChipText, { color: colors.textPrimary }]}>
                               {isChecked ? '[SELECTED] ' : ''}{deed.name} (${deed.purchasePrice})
                             </Text>
                           </Pressable>
@@ -222,8 +222,8 @@ export function TradeModal({
                 </View>
 
                 {/* ─── REQUEST SECTION (You Receive) ─── */}
-                <View style={styles.tradeBox}>
-                  <Text style={styles.boxTitle}>YOU RECEIVE (From {partnerPlayer.name})</Text>
+                <View style={[styles.tradeBox, { backgroundColor: colors.background, borderColor: colors.surfaceBorder }]}>
+                  <Text style={[styles.boxTitle, { color: colors.textPrimary }]}>YOU RECEIVE (From {partnerPlayer.name})</Text>
 
                   <Input
                     label="Request Cash ($)"
@@ -234,28 +234,28 @@ export function TradeModal({
                     style={styles.amountInput}
                   />
 
-                  <Text style={styles.subLabel}>Select Unbuilt Deeds to Request from {partnerPlayer.name}:</Text>
+                  <Text style={[styles.subLabel, { color: colors.textMuted }]}>Select Unbuilt Deeds to Request from {partnerPlayer.name}:</Text>
                   {partnerEligibleProps.length === 0 ? (
-                    <Text style={styles.noPropsText}>{partnerPlayer.name} has no unbuilt properties available to trade</Text>
+                    <Text style={[styles.noPropsText, { color: colors.textMuted }]}>{partnerPlayer.name} has no unbuilt properties available to trade</Text>
                   ) : (
                     <View style={styles.deedGrid}>
                       {partnerEligibleProps.map((p) => {
                         const deed = BOARD_PROPERTIES.find((b) => b.id === p.propertyId);
                         if (!deed) return null;
                         const isChecked = selectedRequestPropIds.includes(deed.id);
-                        const groupColor = GROUP_COLORS[deed.group] || COLORS.primary;
+                        const groupColor = GROUP_COLORS[deed.group] || colors.primary;
 
                         return (
                           <Pressable
                             key={deed.id}
                             style={[
                               styles.deedChip,
-                              { borderLeftColor: groupColor },
-                              isChecked && styles.deedChipChecked,
+                              { backgroundColor: colors.surface, borderColor: colors.surfaceBorder, borderLeftColor: groupColor },
+                              isChecked && { backgroundColor: colors.emerald + '22', borderColor: colors.emerald },
                             ]}
                             onPress={() => toggleRequestProp(deed.id)}
                           >
-                            <Text style={styles.deedChipText}>
+                            <Text style={[styles.deedChipText, { color: colors.textPrimary }]}>
                               {isChecked ? '[SELECTED] ' : ''}{deed.name} (${deed.purchasePrice})
                             </Text>
                           </Pressable>
@@ -265,9 +265,10 @@ export function TradeModal({
                   )}
                 </View>
 
+                {/* Error Banner */}
                 {errorMsg && (
-                  <View style={styles.errorBox}>
-                    <Text style={styles.errorText}>[WARNING] {errorMsg}</Text>
+                  <View style={[styles.errorBox, { backgroundColor: colors.crimson + '22', borderColor: colors.crimson + '66' }]}>
+                    <Text style={[styles.errorText, { color: colors.crimson }]}>{errorMsg}</Text>
                   </View>
                 )}
               </>
@@ -278,11 +279,12 @@ export function TradeModal({
           </ScrollView>
 
           {/* Footer Buttons */}
-          <View style={styles.footer}>
-            <Button title="Cancel" variant="secondary" onPress={onClose} disabled={loading} />
+          <View style={[styles.footer, { backgroundColor: colors.surface, borderTopColor: colors.surfaceBorder }]}>
+            <Button title="Cancel" variant="ghost" onPress={onClose} />
             <Button
               title="Send Trade Proposal"
-              variant="gold"
+              variant="emerald"
+              size="md"
               loading={loading}
               disabled={!partnerPlayer}
               onPress={handleProposeTrade}

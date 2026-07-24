@@ -10,6 +10,8 @@ import { BOARD_PROPERTIES, GROUP_COLORS } from '../../constants/boardRegistry';
 import { acceptTradeProposal, rejectTradeProposal } from '../../services/firebase/tradeService';
 import { soundEngine } from '../../services/sound/soundService';
 
+import { useThemeStore } from '../../store/useThemeStore';
+
 interface IncomingTradeModalProps {
   visible: boolean;
   trade: TradeProposal | null;
@@ -25,6 +27,7 @@ export function IncomingTradeModal({
   currentPlayerId,
   onClose,
 }: IncomingTradeModalProps) {
+  const { colors } = useThemeStore();
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -72,91 +75,95 @@ export function IncomingTradeModal({
   return (
     <Modal animationType="fade" transparent visible={visible} onRequestClose={onClose}>
       <View style={styles.overlay}>
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
 
           {/* Modal Header */}
-          <View style={styles.header}>
+          <View style={[styles.header, { borderBottomColor: colors.surfaceBorder }]}>
             <View>
-              <Text style={styles.title}>Trade Proposal Received</Text>
-              <Text style={styles.subtitle}>{trade.senderName} proposed a deal with you</Text>
+              <Text style={[styles.title, { color: colors.textPrimary }]}>Trade Proposal Received</Text>
+              <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{trade.senderName} proposed a deal with you</Text>
             </View>
           </View>
 
           <ScrollView style={styles.scrollBody} contentContainerStyle={{ padding: SPACING.md }}>
 
             {/* YOU RECEIVE */}
-            <View style={styles.dealBoxPositive}>
-              <Text style={styles.boxTitle}>YOU RECEIVE (From {trade.senderName})</Text>
+            <View style={[styles.dealBoxPositive, { backgroundColor: colors.background, borderColor: colors.emerald }]}>
+              <Text style={[styles.boxTitle, { color: colors.emerald }]}>YOU RECEIVE (From {trade.senderName})</Text>
 
               {trade.senderCash > 0 && (
-                <Text style={styles.cashText}>+${trade.senderCash.toLocaleString()}</Text>
+                <Text style={[styles.cashText, { color: colors.emerald }]}>+${trade.senderCash.toLocaleString()}</Text>
               )}
 
               {senderPropNames.length > 0 ? (
                 <View style={styles.propList}>
                   {senderPropNames.map((deed) => {
                     if (!deed) return null;
-                    const groupColor = GROUP_COLORS[deed.group] || COLORS.primary;
+                    const groupColor = GROUP_COLORS[deed.group] || colors.primary;
                     return (
-                      <View key={deed.id} style={[styles.deedPill, { borderLeftColor: groupColor }]}>
-                        <Text style={styles.deedName}>{deed.name}</Text>
-                        <Text style={styles.deedValue}>${deed.purchasePrice}</Text>
+                      <View key={deed.id} style={[styles.deedPill, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder, borderLeftColor: groupColor }]}>
+                        <Text style={[styles.deedName, { color: colors.textPrimary }]}>{deed.name}</Text>
+                        <Text style={[styles.deedValue, { color: colors.textSecondary }]}>${deed.purchasePrice}</Text>
                       </View>
                     );
                   })}
                 </View>
               ) : trade.senderCash === 0 ? (
-                <Text style={styles.emptyText}>No assets offered</Text>
+                <Text style={[styles.emptyText, { color: colors.textMuted }]}>No assets offered</Text>
               ) : null}
             </View>
 
             {/* YOU GIVE */}
-            <View style={styles.dealBoxNegative}>
-              <Text style={styles.boxTitle}>YOU GIVE (To {trade.senderName})</Text>
+            <View style={[styles.dealBoxNegative, { backgroundColor: colors.background, borderColor: colors.crimson }]}>
+              <Text style={[styles.boxTitle, { color: colors.crimson }]}>YOU GIVE (To {trade.senderName})</Text>
 
               {trade.receiverCash > 0 && (
-                <Text style={styles.cashTextRed}>-${trade.receiverCash.toLocaleString()}</Text>
+                <Text style={[styles.cashTextRed, { color: colors.crimson }]}>-${trade.receiverCash.toLocaleString()}</Text>
               )}
 
               {receiverPropNames.length > 0 ? (
                 <View style={styles.propList}>
                   {receiverPropNames.map((deed) => {
                     if (!deed) return null;
-                    const groupColor = GROUP_COLORS[deed.group] || COLORS.primary;
+                    const groupColor = GROUP_COLORS[deed.group] || colors.primary;
                     return (
-                      <View key={deed.id} style={[styles.deedPill, { borderLeftColor: groupColor }]}>
-                        <Text style={styles.deedName}>{deed.name}</Text>
-                        <Text style={styles.deedValue}>${deed.purchasePrice}</Text>
+                      <View key={deed.id} style={[styles.deedPill, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder, borderLeftColor: groupColor }]}>
+                        <Text style={[styles.deedName, { color: colors.textPrimary }]}>{deed.name}</Text>
+                        <Text style={[styles.deedValue, { color: colors.textSecondary }]}>${deed.purchasePrice}</Text>
                       </View>
                     );
                   })}
                 </View>
-              ) : trade.receiverCash === 0 ? (
-                <Text style={styles.emptyText}>No assets requested</Text>
+              ) : receiverPropNames.length === 0 && trade.receiverCash === 0 ? (
+                <Text style={[styles.emptyText, { color: colors.textMuted }]}>No assets requested</Text>
               ) : null}
             </View>
 
+            {/* Error Banner */}
             {errorMsg && (
-              <View style={styles.errorBox}>
-                <Text style={styles.errorText}>[WARNING] {errorMsg}</Text>
+              <View style={[styles.errorBox, { backgroundColor: colors.crimson + '22', borderColor: colors.crimson + '66' }]}>
+                <Text style={[styles.errorText, { color: colors.crimson }]}>{errorMsg}</Text>
               </View>
             )}
-
           </ScrollView>
 
-          {/* Footer Buttons */}
-          <View style={styles.footer}>
+          {/* Modal Footer */}
+          <View style={[styles.footer, { backgroundColor: colors.surface, borderTopColor: colors.surfaceBorder }]}>
             <Button
-              title="Decline Deal"
+              title="Decline"
               variant="danger"
+              size="md"
               loading={loading}
               onPress={handleReject}
+              style={{ flex: 1 }}
             />
             <Button
               title="Accept Trade Deal"
               variant="emerald"
+              size="md"
               loading={loading}
               onPress={handleAccept}
+              style={{ flex: 1 }}
             />
           </View>
 
