@@ -148,9 +148,9 @@ export default function PayTerminalScreen() {
           onChangeText={setReason}
         />
 
-        <View style={styles.balanceSummary}>
-          <Text style={styles.balanceText}>Your Balance:</Text>
-          <Text style={styles.balanceNum}>${currentPlayer.balance.toLocaleString()}</Text>
+        <View style={[styles.balanceSummary, { backgroundColor: colors.background, borderColor: colors.surfaceBorder }]}>
+          <Text style={[styles.balanceText, { color: colors.textSecondary }]}>Your Balance:</Text>
+          <Text style={[styles.balanceNum, { color: colors.emerald }]}>${currentPlayer.balance.toLocaleString()}</Text>
         </View>
 
         <Button

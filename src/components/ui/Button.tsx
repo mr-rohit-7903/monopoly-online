@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, Pressable, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
-import { COLORS, RADIUS, SPACING } from '../../constants/theme';
+import { RADIUS, SPACING } from '../../constants/theme';
+import { useThemeStore } from '../../store/useThemeStore';
 
 interface ButtonProps {
   title: string;
@@ -25,29 +26,31 @@ export const Button: React.FC<ButtonProps> = ({
   textStyle,
   icon,
 }) => {
+  const { colors } = useThemeStore();
+
   const getBackgroundColor = () => {
-    if (disabled) return COLORS.surfaceLight;
+    if (disabled) return colors.surfaceLight;
     switch (variant) {
       case 'secondary':
-        return COLORS.surface;
+        return colors.surface;
       case 'danger':
-        return COLORS.crimson;
+        return colors.crimson;
       case 'gold':
-        return COLORS.gold;
+        return colors.primary; // Dynamic brand primary
       case 'emerald':
-        return COLORS.emerald;
+        return colors.emerald;
       case 'ghost':
         return 'transparent';
       case 'primary':
       default:
-        return COLORS.primary;
+        return colors.primary;
     }
   };
 
   const getTextColor = () => {
-    if (disabled) return COLORS.textMuted;
-    if (variant === 'ghost') return COLORS.primaryLight;
-    if (variant === 'secondary') return COLORS.textPrimary;
+    if (disabled) return colors.textMuted;
+    if (variant === 'ghost') return colors.primaryLight;
+    if (variant === 'secondary') return colors.textPrimary;
     return '#FFFFFF';
   };
 
@@ -69,7 +72,7 @@ export const Button: React.FC<ButtonProps> = ({
         styles.button,
         { backgroundColor: getBackgroundColor() },
         getPadding(),
-        variant === 'secondary' && styles.secondaryBorder,
+        variant === 'secondary' && { borderWidth: 1, borderColor: colors.surfaceBorder },
         pressed && !disabled && styles.pressed,
         style,
       ]}
@@ -93,10 +96,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-  },
-  secondaryBorder: {
-    borderWidth: 1,
-    borderColor: COLORS.surfaceBorder,
   },
   pressed: {
     opacity: 0.85,

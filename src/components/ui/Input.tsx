@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, View, TextInputProps } from 'react-native';
-import { COLORS, RADIUS, SPACING } from '../../constants/theme';
+import { RADIUS, SPACING } from '../../constants/theme';
+import { useThemeStore } from '../../store/useThemeStore';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -8,19 +9,26 @@ interface InputProps extends TextInputProps {
 }
 
 export const Input: React.FC<InputProps> = ({ label, error, style, ...props }) => {
+  const { colors } = useThemeStore();
+
   return (
     <View style={styles.container}>
-      {label && <Text style={styles.label}>{label}</Text>}
+      {label && <Text style={[styles.label, { color: colors.textSecondary }]}>{label}</Text>}
       <TextInput
         style={[
           styles.input,
-          error ? styles.inputError : null,
+          {
+            backgroundColor: colors.surface,
+            color: colors.textPrimary,
+            borderColor: colors.surfaceBorder,
+          },
+          error ? { borderColor: colors.crimson } : null,
           style,
         ]}
-        placeholderTextColor={COLORS.textMuted}
+        placeholderTextColor={colors.textMuted}
         {...props}
       />
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && <Text style={[styles.errorText, { color: colors.crimson }]}>{error}</Text>}
     </View>
   );
 };
@@ -32,24 +40,16 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.textSecondary,
     marginBottom: SPACING.xs,
   },
   input: {
-    backgroundColor: COLORS.surface,
-    color: COLORS.textPrimary,
     borderRadius: RADIUS.md,
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm + 4,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: COLORS.surfaceBorder,
-  },
-  inputError: {
-    borderColor: COLORS.crimson,
   },
   errorText: {
-    color: COLORS.crimson,
     fontSize: 12,
     marginTop: SPACING.xs,
   },

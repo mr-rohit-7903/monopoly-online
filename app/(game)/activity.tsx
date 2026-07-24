@@ -80,22 +80,21 @@ export default function HistoryLogsScreen() {
     <View style={styles.container}>
 
       {/* Stats Summary Bar */}
-      <View style={styles.statsBar}>
+      <View style={[styles.statsBar, { backgroundColor: colors.surface, borderBottomColor: colors.surfaceBorder }]}>
         <View style={styles.statBox}>
-          <Text style={styles.statLabel}>Total Transactions</Text>
-          <Text style={styles.statValue}>{logs.length}</Text>
+          <Text style={[styles.statLabel, { color: colors.textMuted }]}>Total Transactions</Text>
+          <Text style={[styles.statValue, { color: colors.textPrimary }]}>{logs.length}</Text>
         </View>
-        <View style={styles.statDivider} />
+        <View style={[styles.statDivider, { backgroundColor: colors.surfaceBorder }]} />
         <View style={styles.statBox}>
-          <Text style={styles.statLabel}>Funds Moved</Text>
-          <Text style={[styles.statValue, { color: COLORS.emerald }]}>
+          <Text style={[styles.statLabel, { color: colors.textMuted }]}>Funds Moved</Text>
+          <Text style={[styles.statValue, { color: colors.emerald }]}>
             ${totalVolume.toLocaleString()}
           </Text>
         </View>
-        <View style={styles.statDivider} />
         <View style={[styles.statDivider, { backgroundColor: colors.surfaceBorder }]} />
         <View style={styles.statBox}>
-          <Text style={styles.statLabel}>Active Players</Text>
+          <Text style={[styles.statLabel, { color: colors.textMuted }]}>Active Players</Text>
           <Text style={[styles.statValue, { color: colors.textPrimary }]}>{players.length}</Text>
         </View>
       </View>
@@ -182,6 +181,7 @@ export default function HistoryLogsScreen() {
 }
 
 function HistoryLogCard({ item }: { item: Transaction | AppNotification }) {
+  const { colors } = useThemeStore();
   const isTransaction = 'category' in item;
   const timestamp = item.timestamp || Date.now();
 
@@ -196,37 +196,36 @@ function HistoryLogCard({ item }: { item: Transaction | AppNotification }) {
       const tx = item as Transaction;
       switch (tx.category) {
         case 'property_buy':
-          return { label: 'BUY PROPERTY', color: COLORS.emerald, tag: 'BUY' };
+          return { label: 'BUY PROPERTY', color: colors.emerald, tag: 'BUY' };
         case 'house_build':
-          return { label: 'HOUSE BUILT', color: COLORS.gold, tag: 'BUILD' };
+          return { label: 'HOUSE BUILT', color: colors.gold, tag: 'BUILD' };
         case 'hotel_build':
-          return { label: 'HOTEL BUILT', color: COLORS.gold, tag: 'HOTEL' };
+          return { label: 'HOTEL BUILT', color: colors.gold, tag: 'HOTEL' };
         case 'house_sell':
           return { label: 'HOUSE SOLD', color: '#F97316', tag: 'SELL' };
         case 'hotel_sell':
           return { label: 'HOTEL SOLD', color: '#F97316', tag: 'SELL' };
         case 'mortgage':
-          return { label: 'MORTGAGED', color: COLORS.crimson, tag: 'MORTGAGE' };
+          return { label: 'MORTGAGED', color: colors.crimson, tag: 'MORTGAGE' };
         case 'unmortgage':
-          return { label: 'UNMORTGAGED', color: COLORS.emerald, tag: 'ACTIVE' };
+          return { label: 'UNMORTGAGED', color: colors.emerald, tag: 'ACTIVE' };
         case 'bank_deposit':
-          return { label: 'BANK PAYOUT', color: COLORS.emerald, tag: 'PAYOUT' };
+          return { label: 'BANK PAYOUT', color: colors.emerald, tag: 'PAYOUT' };
         case 'bank_collect':
-          return { label: 'BANK FINE', color: COLORS.crimson, tag: 'FINE' };
+          return { label: 'BANK FINE', color: colors.crimson, tag: 'FINE' };
         case 'multi_collect':
           return { label: 'PARTY HOUSE', color: '#A855F7', tag: 'PARTY' };
         case 'multi_pay':
           return { label: 'RESORTS EXPENSE', color: '#EC4899', tag: 'RESORT' };
         case 'p2p':
-          return { label: 'RENT / P2P', color: COLORS.primary, tag: 'RENT' };
         default:
-          return { label: 'TRANSACTION', color: COLORS.primary, tag: 'LOG' };
+          return { label: 'PAYMENT / RENT', color: colors.primary, tag: 'RENT' };
       }
     } else {
       const notif = item as AppNotification;
       return {
         label: notif.type.toUpperCase(),
-        color: COLORS.primary,
+        color: colors.primary,
         tag: 'NOTIF',
       };
     }
@@ -237,32 +236,32 @@ function HistoryLogCard({ item }: { item: Transaction | AppNotification }) {
   if (isTransaction) {
     const tx = item as Transaction;
     return (
-      <View style={[styles.card, { borderLeftColor: meta.color }]}>
+      <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder, borderLeftColor: meta.color }]}>
         <View style={styles.cardHeader}>
           <View style={styles.cardHeaderLeft}>
             <View style={[styles.categoryBadge, { backgroundColor: meta.color + '22', borderColor: meta.color }]}>
               <Text style={[styles.badgeText, { color: meta.color }]}>{meta.label}</Text>
             </View>
           </View>
-          <Text style={styles.timeText}>{formatTime(timestamp)}</Text>
+          <Text style={[styles.timeText, { color: colors.textMuted }]}>{formatTime(timestamp)}</Text>
         </View>
 
         <View style={styles.cardBody}>
-          <Text style={styles.partyText}>
-            <Text style={styles.boldText}>{tx.senderName || 'Bank'}</Text> → <Text style={styles.boldText}>{tx.receiverName || 'Bank'}</Text>
+          <Text style={[styles.partyText, { color: colors.textSecondary }]}>
+            <Text style={[styles.boldText, { color: colors.textPrimary }]}>{tx.senderName || 'Bank'}</Text> → <Text style={[styles.boldText, { color: colors.textPrimary }]}>{tx.receiverName || 'Bank'}</Text>
           </Text>
 
-          <Text style={styles.reasonText}>{tx.reason}</Text>
+          <Text style={[styles.reasonText, { color: colors.textPrimary }]}>{tx.reason}</Text>
 
           {tx.propertyName && (
-            <View style={styles.propPill}>
-              <Text style={styles.propPillText}>{tx.propertyName}</Text>
+            <View style={[styles.propPill, { backgroundColor: colors.surfaceLight }]}>
+              <Text style={[styles.propPillText, { color: colors.textPrimary }]}>{tx.propertyName}</Text>
             </View>
           )}
         </View>
 
         <View style={styles.cardFooter}>
-          <Text style={styles.amountLabel}>Total Amount:</Text>
+          <Text style={[styles.amountLabel, { color: colors.textMuted }]}>Total Amount:</Text>
           <Text style={[styles.amountValue, { color: meta.color }]}>
             ${(tx.amount || 0).toLocaleString()}
           </Text>
@@ -272,16 +271,16 @@ function HistoryLogCard({ item }: { item: Transaction | AppNotification }) {
   } else {
     const notif = item as AppNotification;
     return (
-      <View style={[styles.card, { borderLeftColor: COLORS.purple }]}>
+      <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder, borderLeftColor: colors.primary }]}>
         <View style={styles.cardHeader}>
-          <View style={[styles.categoryBadge, { backgroundColor: COLORS.purple + '22', borderColor: COLORS.purple }]}>
-            <Text style={[styles.badgeText, { color: COLORS.purple }]}>{notif.title}</Text>
+          <View style={[styles.categoryBadge, { backgroundColor: colors.primary + '22', borderColor: colors.primary }]}>
+            <Text style={[styles.badgeText, { color: colors.primary }]}>{notif.title}</Text>
           </View>
-          <Text style={styles.timeText}>{formatTime(timestamp)}</Text>
+          <Text style={[styles.timeText, { color: colors.textMuted }]}>{formatTime(timestamp)}</Text>
         </View>
 
         <View style={styles.cardBody}>
-          <Text style={styles.reasonText}>{notif.message}</Text>
+          <Text style={[styles.reasonText, { color: colors.textPrimary }]}>{notif.message}</Text>
         </View>
       </View>
     );
