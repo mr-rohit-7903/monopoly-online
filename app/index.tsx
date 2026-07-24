@@ -7,10 +7,14 @@ import { useAuthStore } from '../src/store/useAuthStore';
 
 import { useGameStore } from '../src/store/useGameStore';
 
+import { useThemeStore } from '../src/store/useThemeStore';
+import { ThemeToggle } from '../src/components/ui/ThemeToggle';
+
 export default function HomeScreen() {
   const router = useRouter();
   const { initAuth, userId, isAuthenticating } = useAuthStore();
   const { currentGame, leaveGame } = useGameStore();
+  const { colors } = useThemeStore();
 
   useEffect(() => {
     initAuth().catch((err) => console.error('Auth initialization error:', err));
@@ -26,17 +30,20 @@ export default function HomeScreen() {
   }, [currentGame?.status]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Text style={styles.badge}>Companion Banking</Text>
-          <Text style={styles.title}>MONOPOLY</Text>
-          <Text style={styles.subtitle}>International Edition Digital Bank</Text>
+        <View style={styles.topBar}>
+          <View style={styles.header}>
+            <Text style={[styles.badge, { color: colors.primary }]}>Companion Banking</Text>
+            <Text style={[styles.title, { color: colors.textPrimary }]}>MONOPOLY</Text>
+            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>International Edition Digital Bank</Text>
+          </View>
+          <ThemeToggle showLabel />
         </View>
 
-        <View style={styles.heroCard}>
-          <Text style={styles.heroTitle}>No More Paper Money!</Text>
-          <Text style={styles.heroText}>
+        <View style={[styles.heroCard, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
+          <Text style={[styles.heroTitle, { color: colors.textPrimary }]}>No More Paper Money!</Text>
+          <Text style={[styles.heroText, { color: colors.textSecondary }]}>
             Real-time digital ledger, live property management, automated rent doubling, custom duty, chance cards, and instant transaction notifications for your board game night.
           </Text>
         </View>
@@ -103,9 +110,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     minHeight: '100%',
   },
-  header: {
-    alignItems: 'center',
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginTop: SPACING.md,
+  },
+  header: {
+    alignItems: 'flex-start',
   },
   badge: {
     fontSize: 12,

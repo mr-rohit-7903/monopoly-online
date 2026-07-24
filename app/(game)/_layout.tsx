@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../../src/constants/theme';
+import { View } from 'react-native';
 import { useGameStore } from '../../src/store/useGameStore';
 import { useAuthStore } from '../../src/store/useAuthStore';
+import { useThemeStore } from '../../src/store/useThemeStore';
 import { subscribeToTrades } from '../../src/services/firebase/tradeService';
 import { TradeProposal } from '../../src/types/trade';
 import { IncomingTradeModal } from '../../src/components/trading/IncomingTradeModal';
+import { ThemeToggle } from '../../src/components/ui/ThemeToggle';
 
 export default function GameLayout() {
   const { userId } = useAuthStore();
   const { currentGame } = useGameStore();
+  const { colors } = useThemeStore();
   const isBanker = currentGame?.bankerId === userId;
 
   const [pendingTrade, setPendingTrade] = useState<TradeProposal | null>(null);
@@ -34,21 +37,26 @@ export default function GameLayout() {
       <Tabs
         screenOptions={{
           headerStyle: {
-            backgroundColor: COLORS.surface,
+            backgroundColor: colors.surface,
           },
-          headerTintColor: COLORS.textPrimary,
+          headerTintColor: colors.textPrimary,
           headerTitleStyle: {
             fontWeight: 'bold',
           },
           tabBarStyle: {
-            backgroundColor: COLORS.surface,
-            borderTopColor: COLORS.surfaceBorder,
+            backgroundColor: colors.surface,
+            borderTopColor: colors.surfaceBorder,
             height: 60,
             paddingBottom: 8,
             paddingTop: 4,
           },
-          tabBarActiveTintColor: COLORS.gold,
-          tabBarInactiveTintColor: COLORS.textMuted,
+          tabBarActiveTintColor: colors.primary,
+          tabBarInactiveTintColor: colors.textMuted,
+          headerRight: () => (
+            <View style={{ marginRight: 12 }}>
+              <ThemeToggle showLabel={false} />
+            </View>
+          ),
         }}
       >
         <Tabs.Screen
