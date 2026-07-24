@@ -9,7 +9,7 @@ import { getTextureForGroup } from '../../src/constants/textures';
 import { Button } from '../../src/components/ui/Button';
 import { useAuthStore } from '../../src/store/useAuthStore';
 import { useGameStore } from '../../src/store/useGameStore';
-import { calculatePropertyRent } from '../../src/services/engine/rentEngine';
+import { calculatePropertyRent, TRANSPORT_PAIRS } from '../../src/services/engine/rentEngine';
 import {
   calculateUnmortgageCost,
   validateBuildHouseOrHotel,
@@ -424,26 +424,39 @@ export default function PropertiesScreen() {
                     ) : (
                       /* Transport Deed */
                       <>
-                        <View style={styles.rentLeaderRow}>
-                          <Text style={[styles.rentLabel, { color: colors.textPrimary }]}>BASE RENT</Text>
-                          <Text style={[styles.dottedLeader, { color: colors.surfaceBorder }]} numberOfLines={1}>
-                            ...................................................................................................................
-                          </Text>
-                          <Text style={[styles.rentValueText, { color: colors.textPrimary }]}>
-                            ${deed.rentBase?.toLocaleString()}
-                          </Text>
-                        </View>
-                        {deed.rent2Owned ? (
-                          <View style={styles.rentLeaderRow}>
-                            <Text style={[styles.rentLabel, { color: colors.textPrimary }]}>IF 2 TRANSPORTS OWNED</Text>
-                            <Text style={[styles.dottedLeader, { color: colors.surfaceBorder }]} numberOfLines={1}>
-                              ...................................................................................................................
-                            </Text>
-                            <Text style={[styles.rentValueText, { color: colors.textPrimary }]}>
-                              ${deed.rent2Owned.toLocaleString()}
-                            </Text>
-                          </View>
-                        ) : null}
+                        {(() => {
+                          const pairedId = TRANSPORT_PAIRS[deed.id];
+                          const pairedDeed = BOARD_PROPERTIES.find((b) => b.id === pairedId);
+                          const pairRent = deed.rent2Owned || deed.rentBothOwned || (deed.rentBase * 2);
+                          const ownsPair = pairedId ? ownerPropertiesList.some((op) => op.propertyId === pairedId && !op.isMortgaged) : false;
+
+                          return (
+                            <>
+                              <View style={styles.rentLeaderRow}>
+                                <Text style={[styles.rentLabel, { color: !ownsPair ? colors.textPrimary : colors.textSecondary }]}>BASE RENT</Text>
+                                <Text style={[styles.dottedLeader, { color: colors.surfaceBorder }]} numberOfLines={1}>
+                                  ...................................................................................................................
+                                </Text>
+                                <Text style={[styles.rentValueText, { color: !ownsPair ? colors.textPrimary : colors.textSecondary }]}>
+                                  ${deed.rentBase?.toLocaleString()}
+                                </Text>
+                              </View>
+                              {pairedDeed ? (
+                                <View style={styles.rentLeaderRow}>
+                                  <Text style={[styles.rentLabel, ownsPair ? { color: colors.emerald, fontWeight: '900' } : { color: colors.textSecondary }]}>
+                                    RENT WITH {pairedDeed.name.toUpperCase()}
+                                  </Text>
+                                  <Text style={[styles.dottedLeader, { color: colors.surfaceBorder }]} numberOfLines={1}>
+                                    ...................................................................................................................
+                                  </Text>
+                                  <Text style={[styles.rentValueText, ownsPair ? { color: colors.emerald, fontWeight: '900' } : { color: colors.textPrimary }]}>
+                                    ${pairRent.toLocaleString()}
+                                  </Text>
+                                </View>
+                              ) : null}
+                            </>
+                          );
+                        })()}
                       </>
                     )}
                   </View>

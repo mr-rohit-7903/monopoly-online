@@ -10,6 +10,15 @@ export interface RentCalculationResult {
   canBuildHouses: boolean; // true when player owns at least 3 properties in group
 }
 
+export const TRANSPORT_PAIRS: Record<string, string> = {
+  waterways: 'satellite',
+  satellite: 'waterways',
+  railways: 'roadways',
+  roadways: 'railways',
+  airways: 'petroleum',
+  petroleum: 'airways',
+};
+
 export function calculatePropertyRent(
   propertyId: string,
   propertyState: PropertyState,
@@ -110,30 +119,26 @@ export function calculatePropertyRent(
 
   // ─── TRANSPORT PROPERTIES ──────────────────────────────────────────────────
   if (deed.type === 'transport') {
-    const ownedTransportsCount = ownerProperties.filter((op) => {
-      const pDeed = BOARD_PROPERTIES.find((b) => b.id === op.propertyId);
-      return pDeed && pDeed.type === 'transport';
-    }).length;
+    const pairedId = TRANSPORT_PAIRS[deed.id];
+    const pairedDeed = BOARD_PROPERTIES.find((b) => b.id === pairedId);
 
-    let finalRent = deed.rentBase;
-    let breakdown = `Single Transport: $${deed.rentBase.toLocaleString()}`;
+    // Check if the owner also owns the matching pair property (and it's not mortgaged)
+    const ownsPair = pairedId
+      ? ownerProperties.some((op) => op.propertyId === pairedId && !op.isMortgaged)
+      : false;
 
-    if (ownedTransportsCount >= 2) {
-      if (deed.rent2Owned) {
-        finalRent = deed.rent2Owned;
-        breakdown = `Multi-Transport (${ownedTransportsCount} owned): $${finalRent.toLocaleString()}`;
-      } else if (deed.rentBothOwned) {
-        finalRent = deed.rentBothOwned;
-        breakdown = `Multi-Transport (${ownedTransportsCount} owned): $${finalRent.toLocaleString()}`;
-      }
-    }
+    const pairRent = deed.rent2Owned || deed.rentBothOwned || (deed.rentBase * 2);
+    const finalRent = ownsPair ? pairRent : deed.rentBase;
+    const breakdown = ownsPair
+      ? `⭐ Pair Owned (${deed.name} + ${pairedDeed?.name || 'Pair'}): $${finalRent.toLocaleString()}`
+      : `Base Rent: $${deed.rentBase.toLocaleString()} (own ${pairedDeed?.name || 'Pair'} to increase rent to $${pairRent.toLocaleString()})`;
 
     return {
       deed,
       propertyState,
       finalRent,
       breakdown,
-      hasMonopolyBonus: false,
+      hasMonopolyBonus: ownsPair,
       canBuildHouses: false,
     };
   }
