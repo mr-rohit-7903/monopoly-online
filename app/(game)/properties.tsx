@@ -25,6 +25,8 @@ import { PropertyDeed, PropertyState } from '../../src/types/property';
 import { soundEngine } from '../../src/services/sound/soundService';
 import { TradeModal } from '../../src/components/trading/TradeModal';
 
+import { useThemeStore } from '../../src/store/useThemeStore';
+
 type ActionType = 'buy' | 'build' | 'sellBuilding' | 'mortgage' | 'unmortgage' | 'payRent';
 
 interface ModalState {
@@ -41,6 +43,7 @@ interface ModalState {
 export default function PropertiesScreen() {
   const { userId } = useAuthStore();
   const { currentGame, players, properties } = useGameStore();
+  const { colors } = useThemeStore();
 
   const [selectedGroup, setSelectedGroup] = useState<string>('all');
   const [loadingPropId, setLoadingPropId] = useState<string | null>(null);
@@ -205,26 +208,32 @@ export default function PropertiesScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Top Banner Alert for Instant Feedback */}
       {successBanner && (
-        <View style={styles.topSuccessBanner}>
+        <View style={[styles.topSuccessBanner, { backgroundColor: colors.emerald }]}>
           <Text style={styles.topSuccessText}>{successBanner}</Text>
         </View>
       )}
 
       {/* Group Filter Bar */}
-      <View style={styles.filterBar}>
+      <View style={[styles.filterBar, { backgroundColor: colors.surface, borderBottomColor: colors.surfaceBorder }]}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
           {groups.map((group) => {
             const isSelected = selectedGroup === group.id;
             return (
               <Pressable
                 key={group.id}
-                style={[styles.filterChip, isSelected && styles.filterSelected]}
+                style={[
+                  styles.filterChip,
+                  { backgroundColor: isSelected ? colors.primary : colors.surfaceLight }
+                ]}
                 onPress={() => setSelectedGroup(group.id)}
               >
-                <Text style={[styles.filterText, isSelected && styles.filterTextSelected]}>
+                <Text style={[
+                  styles.filterText,
+                  { color: isSelected ? '#FFFFFF' : colors.textSecondary }
+                ]}>
                   {group.label}
                 </Text>
               </Pressable>
@@ -255,7 +264,7 @@ export default function PropertiesScreen() {
             (p) => !!p.ownerId && p.ownerId === (isMyProperty ? currentPlayer.id : ownerId)
           );
           const rentInfo = calculatePropertyRent(deed.id, pState, ownerPropertiesList);
-          const groupColor = GROUP_COLORS[deed.group] || COLORS.primary;
+          const groupColor = GROUP_COLORS[deed.group] || colors.primary;
           const isLoading = loadingPropId === deed.id;
 
           const houseCount = Number(pState.houses || 0);
@@ -278,8 +287,8 @@ export default function PropertiesScreen() {
               key={deed.id}
               style={[
                 styles.deedCard,
-                { borderLeftColor: groupColor },
-                isMyProperty && styles.myPropertyCard,
+                { backgroundColor: colors.surface, borderColor: colors.surfaceBorder, borderLeftColor: groupColor },
+                isMyProperty && { borderColor: colors.emerald, borderWidth: 1 },
                 isOwnedByOther && pState.isMortgaged && styles.mortgagedCard,
               ]}
             >
@@ -289,31 +298,31 @@ export default function PropertiesScreen() {
                   <View style={[styles.groupPill, { backgroundColor: groupColor }]}>
                     <Text style={styles.groupPillText}>{deed.group}</Text>
                   </View>
-                  <Text style={styles.deedName}>{deed.name}</Text>
+                  <Text style={[styles.deedName, { color: colors.textPrimary }]}>{deed.name}</Text>
                 </View>
 
                 {owner ? (
-                  <View style={[styles.ownerBadge, isMyProperty && styles.myOwnerBadge]}>
-                    <Text style={styles.ownerEmoji}>{owner.avatar}</Text>
-                    <Text style={styles.ownerName}>{owner.name}</Text>
+                  <View style={[styles.ownerBadge, { backgroundColor: isMyProperty ? colors.emerald + '33' : colors.surfaceLight }]}>
+                    <Text style={[styles.ownerEmoji, { color: colors.textPrimary }]}>{owner.avatar}</Text>
+                    <Text style={[styles.ownerName, { color: colors.textPrimary }]}>{owner.name}</Text>
                   </View>
                 ) : (
-                  <View style={styles.bankBadge}>
-                    <Text style={styles.bankText}>For Sale</Text>
+                  <View style={[styles.bankBadge, { backgroundColor: colors.gold + '22' }]}>
+                    <Text style={[styles.bankText, { color: colors.primary }]}>For Sale</Text>
                   </View>
                 )}
               </View>
 
               {/* Price / Mortgage / Rent Row */}
               <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Price</Text>
-                <Text style={styles.infoValue}>${deed.purchasePrice.toLocaleString()}</Text>
-                <Text style={styles.infoLabel}>Mortgage</Text>
-                <Text style={styles.infoValue}>${deed.mortgageValue.toLocaleString()}</Text>
+                <Text style={[styles.infoLabel, { color: colors.textMuted }]}>Price</Text>
+                <Text style={[styles.infoValue, { color: colors.textSecondary }]}>${deed.purchasePrice.toLocaleString()}</Text>
+                <Text style={[styles.infoLabel, { color: colors.textMuted }]}>Mortgage</Text>
+                <Text style={[styles.infoValue, { color: colors.textSecondary }]}>${deed.mortgageValue.toLocaleString()}</Text>
                 {!pState.isMortgaged && (
                   <>
-                    <Text style={styles.infoLabel}>Rent</Text>
-                    <Text style={[styles.infoValue, styles.rentValue]}>
+                    <Text style={[styles.infoLabel, { color: colors.textMuted }]}>Rent</Text>
+                    <Text style={[styles.infoValue, styles.rentValue, { color: colors.emerald }]}>
                       ${rentInfo.finalRent.toLocaleString()}
                     </Text>
                   </>

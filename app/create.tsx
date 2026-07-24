@@ -8,15 +8,17 @@ import { Button } from '../src/components/ui/Button';
 import { AvatarPicker } from '../src/components/ui/AvatarPicker';
 import { useAuthStore } from '../src/store/useAuthStore';
 import { useGameStore } from '../src/store/useGameStore';
+import { useThemeStore } from '../src/store/useThemeStore';
 
 export default function CreateGameScreen() {
   const router = useRouter();
   const { userId, initAuth } = useAuthStore();
   const { createGame, isLoading, error } = useGameStore();
+  const { colors } = useThemeStore();
 
   const [name, setName] = useState('');
   const [avatar, setAvatar] = useState('P1');
-  const [color, setColor] = useState('#EF4444');
+  const [color, setColor] = useState('#5588ff');
 
   const handleCreate = async () => {
     if (!name.trim()) {
@@ -39,16 +41,14 @@ export default function CreateGameScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['bottom']}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={styles.title}>Host a New Game</Text>
-          <Text style={styles.subtitle}>
-            Set up your host profile and generate a room code for your players.
-          </Text>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Create New Game</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Host a new companion bank ledger for your table</Text>
         </View>
 
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
           <Input
             label="Your Player Name"
             placeholder="e.g., Banker Alex"

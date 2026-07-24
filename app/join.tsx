@@ -8,16 +8,18 @@ import { Button } from '../src/components/ui/Button';
 import { AvatarPicker } from '../src/components/ui/AvatarPicker';
 import { useAuthStore } from '../src/store/useAuthStore';
 import { useGameStore } from '../src/store/useGameStore';
+import { useThemeStore } from '../src/store/useThemeStore';
 
 export default function JoinGameScreen() {
   const router = useRouter();
   const { userId, initAuth } = useAuthStore();
   const { joinGame, isLoading, error } = useGameStore();
+  const { colors } = useThemeStore();
 
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
   const [avatar, setAvatar] = useState('P2');
-  const [color, setColor] = useState('#3B82F6');
+  const [color, setColor] = useState('#77aaff');
 
   const handleJoin = async () => {
     if (!code.trim()) {
@@ -33,29 +35,27 @@ export default function JoinGameScreen() {
     try {
       const activeUserId = userId || (await initAuth());
       await joinGame({
-        code: code.trim(),
         userId: activeUserId,
+        code: code.trim().toUpperCase(),
         name: name.trim(),
         avatar,
         color,
       });
       router.replace('/lobby');
     } catch (err: any) {
-      Alert.alert('Error Joining Game', err?.message || 'Could not join room.');
+      Alert.alert('Join Failed', err?.message || 'Invalid game code or room full.');
     }
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['bottom']}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={styles.title}>Join Existing Game</Text>
-          <Text style={styles.subtitle}>
-            Enter the 6-character room code provided by your game host.
-          </Text>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Join Existing Room</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Enter room code to connect to live game ledger</Text>
         </View>
 
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
           <Input
             label="Game Room Code"
             placeholder="e.g., MONO88"

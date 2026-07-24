@@ -7,11 +7,13 @@ import { Button } from '../src/components/ui/Button';
 import { PlayerBadge } from '../src/components/ui/PlayerBadge';
 import { useAuthStore } from '../src/store/useAuthStore';
 import { useGameStore } from '../src/store/useGameStore';
+import { useThemeStore } from '../src/store/useThemeStore';
 
 export default function LobbyScreen() {
   const router = useRouter();
   const { userId } = useAuthStore();
   const { currentGame, players, assignBanker, startGame, isLoading } = useGameStore();
+  const { colors } = useThemeStore();
 
   const isHost = currentGame?.hostId === userId;
 
@@ -24,9 +26,9 @@ export default function LobbyScreen() {
 
   if (!currentGame) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.centerContainer}>
-          <Text style={styles.loadingText}>Loading game session...</Text>
+          <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading game session...</Text>
           <Button
             title="Return Home"
             variant="secondary"
@@ -39,14 +41,14 @@ export default function LobbyScreen() {
   }
 
   const handleStartGame = async () => {
-    if (players.length < 1) {
-      Alert.alert('Cannot Start', 'At least 1 player is required to start.');
+    if (!currentGame.bankerId) {
+      Alert.alert('Assign Banker', 'Please assign a Banker before starting the game session.');
       return;
     }
     try {
       await startGame();
     } catch (err: any) {
-      Alert.alert('Failed to Start', err?.message || 'Could not start game session.');
+      Alert.alert('Start Error', err?.message || 'Failed to start game session.');
     }
   };
 
@@ -65,7 +67,7 @@ export default function LobbyScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['bottom']}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Room Code Card */}
         <View style={styles.codeCard}>

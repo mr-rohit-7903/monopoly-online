@@ -9,11 +9,13 @@ import { useGameStore } from '../../src/store/useGameStore';
 import { soundEngine } from '../../src/services/sound/soundService';
 import { payPlayerToPlayer, collectToBank } from '../../src/services/firebase/transactionService';
 
+import { useThemeStore } from '../../src/store/useThemeStore';
 import { TradeModal } from '../../src/components/trading/TradeModal';
 
 export default function PayTerminalScreen() {
   const { userId } = useAuthStore();
   const { currentGame, players, properties } = useGameStore();
+  const { colors } = useThemeStore();
 
   const [selectedRecipientId, setSelectedRecipientId] = useState<string>('BANK');
   const [amount, setAmount] = useState<string>('');
@@ -26,14 +28,14 @@ export default function PayTerminalScreen() {
 
   if (!currentGame || !currentPlayer) {
     return (
-      <View style={styles.centerContainer}>
-        <Text style={styles.loadingText}>Loading payment terminal...</Text>
+      <View style={[styles.centerContainer, { backgroundColor: colors.background }]}>
+        <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading payment terminal...</Text>
       </View>
     );
   }
 
   const recipients = [
-    { id: 'BANK', name: 'Bank', color: COLORS.emerald },
+    { id: 'BANK', name: 'Bank', color: colors.emerald },
     ...players.filter((p) => p.id !== currentPlayer.id).map((p) => ({
       id: p.id,
       name: `${p.avatar} ${p.name}`,
@@ -85,7 +87,10 @@ export default function PayTerminalScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={styles.scrollContent}
+    >
       <View style={styles.topActionsRow}>
         <Button
           title="Draw Chance Card"
@@ -103,11 +108,11 @@ export default function PayTerminalScreen() {
         />
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Payment Terminal</Text>
-        <Text style={styles.cardSub}>Transfer digital funds to Bank or any player</Text>
+      <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
+        <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>Payment Terminal</Text>
+        <Text style={[styles.cardSub, { color: colors.textSecondary }]}>Transfer digital funds to Bank or any player</Text>
 
-        <Text style={styles.sectionLabel}>Select Recipient</Text>
+        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>Select Recipient</Text>
         <View style={styles.recipientsContainer}>
           {recipients.map((rec) => {
             const isSelected = selectedRecipientId === rec.id;
@@ -116,12 +121,12 @@ export default function PayTerminalScreen() {
                 key={rec.id}
                 style={[
                   styles.recChip,
-                  isSelected && styles.recSelected,
+                  { backgroundColor: isSelected ? colors.surfaceBorder : colors.background },
                   isSelected && { borderColor: rec.color },
                 ]}
                 onPress={() => setSelectedRecipientId(rec.id)}
               >
-                <Text style={styles.recText}>{rec.name}</Text>
+                <Text style={[styles.recText, { color: colors.textPrimary }]}>{rec.name}</Text>
               </Pressable>
             );
           })}

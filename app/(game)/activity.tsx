@@ -12,9 +12,12 @@ import { AppNotification } from '../../src/types/notification';
 
 type FilterType = 'all' | 'p2p' | 'property' | 'building' | 'mortgage' | 'banker';
 
+import { useThemeStore } from '../../src/store/useThemeStore';
+
 export default function HistoryLogsScreen() {
   const { userId } = useAuthStore();
   const { currentGame, players } = useGameStore();
+  const { colors } = useThemeStore();
 
   const [logs, setLogs] = useState<(Transaction | AppNotification)[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -35,9 +38,9 @@ export default function HistoryLogsScreen() {
 
   if (!currentGame) {
     return (
-      <View style={styles.centerContainer}>
-        <ActivityIndicator color={COLORS.gold} size="large" />
-        <Text style={styles.emptyText}>Loading history log ledger...</Text>
+      <View style={[styles.centerContainer, { backgroundColor: colors.background }]}>
+        <ActivityIndicator color={colors.primary} size="large" />
+        <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Loading history log ledger...</Text>
       </View>
     );
   }
@@ -90,24 +93,25 @@ export default function HistoryLogsScreen() {
           </Text>
         </View>
         <View style={styles.statDivider} />
+        <View style={[styles.statDivider, { backgroundColor: colors.surfaceBorder }]} />
         <View style={styles.statBox}>
           <Text style={styles.statLabel}>Active Players</Text>
-          <Text style={styles.statValue}>{players.length}</Text>
+          <Text style={[styles.statValue, { color: colors.textPrimary }]}>{players.length}</Text>
         </View>
       </View>
 
       {/* Search Input Bar */}
-      <View style={styles.searchContainer}>
+      <View style={[styles.searchContainer, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
         <TextInput
-          style={styles.searchInput}
+          style={[styles.searchInput, { color: colors.textPrimary }]}
           placeholder="Search by player, property, or action..."
-          placeholderTextColor={COLORS.textMuted}
+          placeholderTextColor={colors.textMuted}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
         {searchQuery.length > 0 && (
           <Pressable onPress={() => setSearchQuery('')}>
-            <Text style={styles.clearSearchText}>✕</Text>
+            <Text style={[styles.clearSearchText, { color: colors.textMuted }]}>✕</Text>
           </Pressable>
         )}
       </View>
@@ -127,10 +131,14 @@ export default function HistoryLogsScreen() {
             return (
               <Pressable
                 key={btn.id}
-                style={[styles.filterChip, isSelected && styles.filterSelected]}
+                style={[
+                  styles.filterChip, 
+                  { backgroundColor: isSelected ? colors.primary : colors.surface, borderColor: colors.surfaceBorder },
+                  isSelected && styles.filterSelected
+                ]}
                 onPress={() => setActiveFilter(btn.id as FilterType)}
               >
-                <Text style={[styles.filterText, isSelected && styles.filterTextSelected]}>
+                <Text style={[styles.filterText, { color: isSelected ? '#FFF' : colors.textSecondary }]}>
                   {btn.label}
                 </Text>
               </Pressable>
@@ -143,15 +151,15 @@ export default function HistoryLogsScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {loading ? (
           <View style={styles.emptyContainer}>
-            <ActivityIndicator color={COLORS.gold} size="large" />
-            <Text style={styles.emptyText}>Syncing live history logs...</Text>
+            <ActivityIndicator color={colors.primary} size="large" />
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Syncing live history logs...</Text>
           </View>
         ) : filteredLogs.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyTitle}>
+            <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>
               {searchQuery.length > 0 ? 'No Matching Logs Found' : 'No History Logs Recorded Yet'}
             </Text>
-            <Text style={styles.emptyText}>
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
               {searchQuery.length > 0
                 ? `No transactions matched "${searchQuery}". Try clearing your search.`
                 : 'All game transactions, property buys, house builds, mortgages, and rent payments will be recorded here in real time.'}

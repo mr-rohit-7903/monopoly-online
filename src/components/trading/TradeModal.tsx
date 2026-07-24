@@ -11,6 +11,7 @@ import { PropertyState } from '../../types/property';
 import { BOARD_PROPERTIES, GROUP_COLORS } from '../../constants/boardRegistry';
 import { createTradeProposal } from '../../services/firebase/tradeService';
 import { soundEngine } from '../../services/sound/soundService';
+import { useThemeStore } from '../../store/useThemeStore';
 
 interface TradeModalProps {
   visible: boolean;
@@ -33,6 +34,7 @@ export function TradeModal({
   preselectedPartnerId,
   preselectedPropertyId,
 }: TradeModalProps) {
+  const { colors } = useThemeStore();
   const otherPlayers = players.filter((p) => p.id !== currentPlayer.id);
 
   const [selectedPartnerId, setSelectedPartnerId] = useState<string>(
@@ -131,18 +133,18 @@ export function TradeModal({
   return (
     <Modal animationType="slide" transparent visible={visible} onRequestClose={onClose}>
       <View style={styles.overlay}>
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
 
           {/* Modal Header */}
-          <View style={styles.header}>
+          <View style={[styles.header, { borderBottomColor: colors.surfaceBorder }]}>
             <View style={styles.titleRow}>
               <View>
-                <Text style={styles.title}>Propose Trade & Swap</Text>
-                <Text style={styles.subtitle}>Negotiate cash and unbuilt deeds with any player</Text>
+                <Text style={[styles.title, { color: colors.textPrimary }]}>Propose Trade & Swap</Text>
+                <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Negotiate cash and unbuilt deeds with any player</Text>
               </View>
             </View>
             <Pressable onPress={onClose} style={styles.closeBtn}>
-              <Text style={styles.closeText}>✕</Text>
+              <Text style={[styles.closeText, { color: colors.textMuted }]}>✕</Text>
             </Pressable>
           </View>
 

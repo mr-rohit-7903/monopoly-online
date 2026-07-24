@@ -12,6 +12,8 @@ import {
   executeMultiCollect,
 } from '../../services/firebase/transactionService';
 
+import { useThemeStore } from '../../store/useThemeStore';
+
 interface CardDrawerModalProps {
   visible: boolean;
   onClose: () => void;
@@ -25,6 +27,7 @@ export const CardDrawerModal: React.FC<CardDrawerModalProps> = ({
   gameId,
   currentPlayer,
 }) => {
+  const { colors } = useThemeStore();
   const [deckType, setDeckType] = useState<'chance' | 'community_chest'>('chance');
   const [selectedCard, setSelectedCard] = useState<GameCard | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -84,11 +87,11 @@ export const CardDrawerModal: React.FC<CardDrawerModalProps> = ({
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <View style={styles.overlay}>
-        <View style={styles.modalCard}>
+        <View style={[styles.modalCard, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
           <View style={styles.header}>
-            <Text style={styles.title}>Chance & Community Chest</Text>
+            <Text style={[styles.title, { color: colors.textPrimary }]}>Chance & Community Chest</Text>
             <Pressable onPress={onClose} style={styles.closeBtn}>
-              <Text style={styles.closeText}>✕</Text>
+              <Text style={[styles.closeText, { color: colors.textMuted }]}>✕</Text>
             </Pressable>
           </View>
 

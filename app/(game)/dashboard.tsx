@@ -16,6 +16,8 @@ import {
 import { calculateCustomDuty, calculateTravellingDuty } from '../../src/services/engine/taxEngine';
 import { soundEngine } from '../../src/services/sound/soundService';
 
+import { useThemeStore } from '../../src/store/useThemeStore';
+
 interface DutyModalData {
   type: 'custom' | 'travelling';
   title: string;
@@ -28,6 +30,7 @@ interface DutyModalData {
 export default function DashboardScreen() {
   const { userId } = useAuthStore();
   const { currentGame, players, properties } = useGameStore();
+  const { colors } = useThemeStore();
 
   const [payModalVisible, setPayModalVisible] = useState(false);
   const [activeDutyModal, setActiveDutyModal] = useState<DutyModalData | null>(null);
@@ -199,29 +202,32 @@ export default function DashboardScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={styles.scrollContent}
+    >
       {/* Top Banner Feedback */}
       {topBanner && (
-        <View style={styles.topBanner}>
-          <Text style={styles.topBannerText}>{topBanner}</Text>
+        <View style={[styles.topBanner, { backgroundColor: colors.surfaceLight, borderColor: colors.gold }]}>
+          <Text style={[styles.topBannerText, { color: colors.primary }]}>{topBanner}</Text>
         </View>
       )}
 
       {/* Main Player Ledger Card */}
-      <View style={styles.heroLedger}>
+      <View style={[styles.heroLedger, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
         <View style={styles.playerHeader}>
-          <View style={styles.playerAvatarBg}>
-            <Text style={styles.avatarText}>{currentPlayer.avatar}</Text>
+          <View style={[styles.playerAvatarBg, { backgroundColor: colors.surfaceLight }]}>
+            <Text style={[styles.avatarText, { color: colors.textPrimary }]}>{currentPlayer.avatar}</Text>
           </View>
           <View>
-            <Text style={styles.welcomeText}>Logged in as</Text>
-            <Text style={styles.playerName}>{currentPlayer.name}</Text>
+            <Text style={[styles.welcomeText, { color: colors.textMuted }]}>Logged in as</Text>
+            <Text style={[styles.playerName, { color: colors.textPrimary }]}>{currentPlayer.name}</Text>
           </View>
         </View>
 
-        <View style={styles.balanceContainer}>
-          <Text style={styles.balanceLabel}>Current Cash Balance</Text>
-          <Text style={styles.balanceAmount}>${currentPlayer.balance.toLocaleString()}</Text>
+        <View style={[styles.balanceContainer, { backgroundColor: colors.background, borderColor: colors.surfaceBorder }]}>
+          <Text style={[styles.balanceLabel, { color: colors.textMuted }]}>Current Cash Balance</Text>
+          <Text style={[styles.balanceAmount, { color: colors.emerald }]}>${currentPlayer.balance.toLocaleString()}</Text>
         </View>
 
         {/* Pass GO Button */}
@@ -236,53 +242,68 @@ export default function DashboardScreen() {
       </View>
 
       {/* Banking Quick Actions Grid */}
-      <Text style={styles.sectionTitle}>Banking & Quick Actions</Text>
+      <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Banking & Quick Actions</Text>
       <View style={styles.actionGrid}>
-        <Pressable style={styles.gridCard} onPress={() => setPayModalVisible(true)}>
-          <Text style={styles.gridTitle}>Send Money</Text>
-          <Text style={styles.gridSubtitle}>Pay Bank or Player</Text>
+        <Pressable
+          style={[styles.gridCard, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}
+          onPress={() => setPayModalVisible(true)}
+        >
+          <Text style={[styles.gridTitle, { color: colors.textPrimary }]}>Send Money</Text>
+          <Text style={[styles.gridSubtitle, { color: colors.textMuted }]}>Pay Bank or Player</Text>
         </Pressable>
 
-        <Pressable style={styles.gridCard} onPress={handlePartyHouse}>
-          <Text style={styles.gridTitle}>Party House</Text>
-          <Text style={styles.gridSubtitle}>+$200 from each player</Text>
+        <Pressable
+          style={[styles.gridCard, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}
+          onPress={handlePartyHouse}
+        >
+          <Text style={[styles.gridTitle, { color: colors.textPrimary }]}>Party House</Text>
+          <Text style={[styles.gridSubtitle, { color: colors.textMuted }]}>+$200 from each player</Text>
         </Pressable>
 
-        <Pressable style={styles.gridCard} onPress={handleResorts}>
-          <Text style={styles.gridTitle}>Resorts</Text>
-          <Text style={styles.gridSubtitle}>-$200 to each player</Text>
+        <Pressable
+          style={[styles.gridCard, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}
+          onPress={handleResorts}
+        >
+          <Text style={[styles.gridTitle, { color: colors.textPrimary }]}>Resorts</Text>
+          <Text style={[styles.gridSubtitle, { color: colors.textMuted }]}>-$200 to each player</Text>
         </Pressable>
 
-        <Pressable style={styles.gridCard} onPress={handleCustomDuty}>
-          <Text style={styles.gridTitle}>Custom Duty</Text>
-          <Text style={styles.gridSubtitle}>$100 / country site</Text>
+        <Pressable
+          style={[styles.gridCard, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}
+          onPress={handleCustomDuty}
+        >
+          <Text style={[styles.gridTitle, { color: colors.textPrimary }]}>Custom Duty</Text>
+          <Text style={[styles.gridSubtitle, { color: colors.textMuted }]}>$100 / country site</Text>
         </Pressable>
 
-        <Pressable style={styles.gridCard} onPress={handleTravellingDuty}>
-          <Text style={styles.gridTitle}>Travelling Duty</Text>
-          <Text style={styles.gridSubtitle}>$50 / country site</Text>
+        <Pressable
+          style={[styles.gridCard, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}
+          onPress={handleTravellingDuty}
+        >
+          <Text style={[styles.gridTitle, { color: colors.textPrimary }]}>Travelling Duty</Text>
+          <Text style={[styles.gridSubtitle, { color: colors.textMuted }]}>$50 / country site</Text>
         </Pressable>
       </View>
 
       {/* Synchronized Player Leaderboard */}
-      <Text style={[styles.sectionTitle, { marginTop: SPACING.xl }]}>Live Player Balances</Text>
-      <View style={styles.leaderboardCard}>
+      <Text style={[styles.sectionTitle, { marginTop: SPACING.xl, color: colors.textPrimary }]}>Live Player Balances</Text>
+      <View style={[styles.leaderboardCard, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder }]}>
         {players
           .slice()
           .sort((a, b) => b.balance - a.balance)
           .map((p, idx) => {
             const isMe = p.id === userId;
             return (
-              <View key={p.id} style={[styles.leaderItem, isMe && styles.leaderItemMe]}>
+              <View key={p.id} style={[styles.leaderItem, isMe && { backgroundColor: colors.surfaceLight }]}>
                 <View style={styles.rankCol}>
-                  <Text style={styles.rankText}>#{idx + 1}</Text>
+                  <Text style={[styles.rankText, { color: colors.primary }]}>#{idx + 1}</Text>
                   <Text style={styles.pAvatar}>{p.avatar}</Text>
-                  <Text style={styles.pName}>
+                  <Text style={[styles.pName, { color: colors.textPrimary }]}>
                     {p.name} {isMe ? '(You)' : ''}
                   </Text>
                 </View>
 
-                <Text style={styles.pBalance}>${p.balance.toLocaleString()}</Text>
+                <Text style={[styles.pBalance, { color: colors.emerald }]}>${p.balance.toLocaleString()}</Text>
               </View>
             );
           })}

@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View, Pressable } from 'react-native';
 import { Player } from '../../types/game';
 import { COLORS, RADIUS, SPACING } from '../../constants/theme';
+import { useThemeStore } from '../../store/useThemeStore';
 
 interface PlayerBadgeProps {
   player: Player;
@@ -18,39 +19,45 @@ export const PlayerBadge: React.FC<PlayerBadgeProps> = ({
   showBankerToggle = false,
   onToggleBanker,
 }) => {
+  const { colors } = useThemeStore();
+
   return (
     <Pressable
       style={[
         styles.card,
-        { borderLeftColor: player.color },
-        isCurrentPlayer && styles.highlightCard,
+        {
+          backgroundColor: colors.surface,
+          borderColor: colors.surfaceBorder,
+          borderLeftColor: player.color,
+        },
+        isCurrentPlayer && { borderColor: colors.primary, borderWidth: 1.5 },
       ]}
       onPress={onPress}
       disabled={!onPress}
     >
       <View style={styles.leftSection}>
         <View style={[styles.avatarCircle, { backgroundColor: player.color + '33' }]}>
-          <Text style={styles.avatarEmoji}>{player.avatar}</Text>
+          <Text style={[styles.avatarEmoji, { color: colors.textPrimary }]}>{player.avatar}</Text>
         </View>
         <View>
           <View style={styles.nameRow}>
-            <Text style={styles.playerName}>{player.name}</Text>
-            {isCurrentPlayer && <Text style={styles.youTag}> (YOU)</Text>}
+            <Text style={[styles.playerName, { color: colors.textPrimary }]}>{player.name}</Text>
+            {isCurrentPlayer && <Text style={[styles.youTag, { color: colors.primary }]}> (YOU)</Text>}
           </View>
           <View style={styles.badgeRow}>
             {player.isHost && (
-              <View style={styles.hostBadge}>
-                <Text style={styles.badgeText}>Host</Text>
+              <View style={[styles.hostBadge, { backgroundColor: colors.gold + '22' }]}>
+                <Text style={[styles.badgeText, { color: colors.primary }]}>Host</Text>
               </View>
             )}
             {player.isBanker && (
-              <View style={styles.bankerBadge}>
-                <Text style={styles.badgeText}>Banker</Text>
+              <View style={[styles.bankerBadge, { backgroundColor: colors.emerald + '22' }]}>
+                <Text style={[styles.badgeText, { color: colors.emerald }]}>Banker</Text>
               </View>
             )}
             {player.inJail && (
-              <View style={styles.jailBadge}>
-                <Text style={styles.badgeText}>In Jail</Text>
+              <View style={[styles.jailBadge, { backgroundColor: colors.crimson + '22' }]}>
+                <Text style={[styles.badgeText, { color: colors.crimson }]}>In Jail</Text>
               </View>
             )}
           </View>
@@ -58,7 +65,7 @@ export const PlayerBadge: React.FC<PlayerBadgeProps> = ({
       </View>
 
       <View style={styles.rightSection}>
-        <Text style={styles.balance}>${player.balance.toLocaleString()}</Text>
+        <Text style={[styles.balance, { color: colors.emerald }]}>${player.balance.toLocaleString()}</Text>
         {showBankerToggle && !player.isBanker && onToggleBanker && (
           <Pressable style={styles.makeBankerBtn} onPress={onToggleBanker}>
             <Text style={styles.makeBankerText}>Make Banker</Text>
