@@ -174,28 +174,42 @@ export async function startGameSession(gameId: string): Promise<void> {
 }
 
 export function subscribeToGame(gameId: string, onUpdate: (game: GameSession | null) => void) {
-  // Subscribe to the game metadata only (not the whole tree including players/properties/notifications)
-  // We pass the whole snapshot but the store only uses top-level GameSession fields
-  const gameRef = ref(db, `games/${gameId}`);
-  return onValue(gameRef, (snapshot) => {
-    if (snapshot.exists()) {
-      const val = snapshot.val();
-      // Extract only game session metadata — strip out sub-collections
-      const session: GameSession = {
-        id: val.id,
-        code: val.code,
-        status: val.status,
-        hostId: val.hostId,
-        bankerId: val.bankerId,
-        createdAt: val.createdAt,
-        updatedAt: val.updatedAt,
-        settings: val.settings,
-      };
-      onUpdate(session);
-    } else {
-      onUpdate(null);
-    }
+  // Subscribe ONLY to the specific top-level game metadata fields.
+  // Previously, this listened to `games/${gameId}` which downloaded the ENTIRE tree
+  // (players, properties, transactions, notifications) on every write — causing OOM crashes
+  // as transactions/notifications accumulated over time.
+
+  const fieldsToWatch = ['id', 'code', 'status', 'hostId', 'bankerId', 'createdAt', 'updatedAt', 'settings'];
+  const sessionData: Record<string, any> = {};
+  const unsubscribers: (() => void)[] = [];
+
+  fieldsToWatch.forEach((field) => {
+    const fieldRef = ref(db, `games/${gameId}/${field}`);
+    const unsub = onValue(fieldRef, (snapshot) => {
+      sessionData[field] = snapshot.exists() ? snapshot.val() : null;
+
+      // Only emit once we have at least the 'id' field (initial load complete)
+      if (sessionData.id) {
+        const session: GameSession = {
+          id: sessionData.id,
+          code: sessionData.code,
+          status: sessionData.status,
+          hostId: sessionData.hostId,
+          bankerId: sessionData.bankerId,
+          createdAt: sessionData.createdAt,
+          updatedAt: sessionData.updatedAt,
+          settings: sessionData.settings,
+        };
+        onUpdate(session);
+      }
+    });
+    unsubscribers.push(unsub);
   });
+
+  // Return a single unsubscribe function that cleans up all field listeners
+  return () => {
+    unsubscribers.forEach((unsub) => unsub());
+  };
 }
 
 export function subscribeToPlayers(gameId: string, onUpdate: (players: Player[]) => void) {
