@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   StyleSheet, Text, View, ScrollView,
-  Modal, Alert,
+  Modal, Alert, ImageBackground,
 } from 'react-native';
 import { COLORS, RADIUS, SPACING } from '../../constants/theme';
 import { Button } from '../ui/Button';
@@ -9,7 +9,7 @@ import { TradeProposal } from '../../types/trade';
 import { BOARD_PROPERTIES, GROUP_COLORS } from '../../constants/boardRegistry';
 import { acceptTradeProposal, rejectTradeProposal } from '../../services/firebase/tradeService';
 import { soundEngine } from '../../services/sound/soundService';
-
+import { getTextureForGroup } from '../../constants/textures';
 import { useThemeStore } from '../../store/useThemeStore';
 
 interface IncomingTradeModalProps {
@@ -100,10 +100,17 @@ export function IncomingTradeModal({
                   {senderPropNames.map((deed) => {
                     if (!deed) return null;
                     const groupColor = GROUP_COLORS[deed.group] || colors.primary;
+                    const textureSource = getTextureForGroup(deed.group);
                     return (
                       <View key={deed.id} style={[styles.deedPill, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder, borderLeftColor: groupColor }]}>
-                        <Text style={[styles.deedName, { color: colors.textPrimary }]}>{deed.name}</Text>
-                        <Text style={[styles.deedValue, { color: colors.textSecondary }]}>${deed.purchasePrice}</Text>
+                        <ImageBackground
+                          source={textureSource}
+                          style={styles.pillTextureBg}
+                          imageStyle={{ borderRadius: RADIUS.sm, opacity: 0.3 }}
+                        >
+                          <Text style={[styles.deedName, { color: colors.textPrimary }]}>{deed.name}</Text>
+                          <Text style={[styles.deedValue, { color: colors.textSecondary }]}>${deed.purchasePrice}</Text>
+                        </ImageBackground>
                       </View>
                     );
                   })}
@@ -126,10 +133,17 @@ export function IncomingTradeModal({
                   {receiverPropNames.map((deed) => {
                     if (!deed) return null;
                     const groupColor = GROUP_COLORS[deed.group] || colors.primary;
+                    const textureSource = getTextureForGroup(deed.group);
                     return (
                       <View key={deed.id} style={[styles.deedPill, { backgroundColor: colors.surface, borderColor: colors.surfaceBorder, borderLeftColor: groupColor }]}>
-                        <Text style={[styles.deedName, { color: colors.textPrimary }]}>{deed.name}</Text>
-                        <Text style={[styles.deedValue, { color: colors.textSecondary }]}>${deed.purchasePrice}</Text>
+                        <ImageBackground
+                          source={textureSource}
+                          style={styles.pillTextureBg}
+                          imageStyle={{ borderRadius: RADIUS.sm, opacity: 0.3 }}
+                        >
+                          <Text style={[styles.deedName, { color: colors.textPrimary }]}>{deed.name}</Text>
+                          <Text style={[styles.deedValue, { color: colors.textSecondary }]}>${deed.purchasePrice}</Text>
+                        </ImageBackground>
                       </View>
                     );
                   })}
@@ -260,14 +274,18 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   deedPill: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.sm,
+    borderLeftWidth: 4,
+    overflow: 'hidden',
+  },
+  pillTextureBg: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.xs,
-    borderRadius: RADIUS.sm,
-    borderLeftWidth: 4,
+    width: '100%',
   },
   deedName: {
     fontSize: 13,

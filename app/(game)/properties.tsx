@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import {
   StyleSheet, Text, View, ScrollView,
-  Pressable, Platform, ActivityIndicator, Modal,
+  Pressable, Platform, ActivityIndicator, Modal, ImageBackground,
 } from 'react-native';
 import { BOARD_PROPERTIES, GROUP_COLORS } from '../../src/constants/boardRegistry';
 import { COLORS, RADIUS, SPACING } from '../../src/constants/theme';
+import { getTextureForGroup } from '../../src/constants/textures';
 import { Button } from '../../src/components/ui/Button';
 import { useAuthStore } from '../../src/store/useAuthStore';
 import { useGameStore } from '../../src/store/useGameStore';
@@ -282,36 +283,44 @@ export default function PropertiesScreen() {
             ? validateBuildHouseOrHotel(deed.id, ownerPropertiesList)
             : null;
 
+          const textureSource = getTextureForGroup(deed.group);
+
           return (
             <View
               key={deed.id}
               style={[
                 styles.deedCard,
                 { backgroundColor: colors.surface, borderColor: colors.surfaceBorder, borderLeftColor: groupColor },
-                isMyProperty && { borderColor: colors.emerald, borderWidth: 1 },
+                isMyProperty && { borderColor: colors.emerald, borderWidth: 1.5 },
                 isOwnedByOther && pState.isMortgaged && styles.mortgagedCard,
               ]}
             >
-              {/* Header */}
-              <View style={styles.deedHeader}>
-                <View style={styles.titleCol}>
-                  <View style={[styles.groupPill, { backgroundColor: groupColor }]}>
-                    <Text style={styles.groupPillText}>{deed.group}</Text>
+              {/* Header with Ticket Texture Background */}
+              <ImageBackground
+                source={textureSource}
+                style={styles.deedHeaderBg}
+                imageStyle={{ borderRadius: RADIUS.sm, opacity: 0.28 }}
+              >
+                <View style={styles.deedHeader}>
+                  <View style={styles.titleCol}>
+                    <View style={[styles.groupPill, { backgroundColor: groupColor }]}>
+                      <Text style={styles.groupPillText}>{deed.group}</Text>
+                    </View>
+                    <Text style={[styles.deedName, { color: colors.textPrimary }]}>{deed.name}</Text>
                   </View>
-                  <Text style={[styles.deedName, { color: colors.textPrimary }]}>{deed.name}</Text>
-                </View>
 
-                {owner ? (
-                  <View style={[styles.ownerBadge, { backgroundColor: isMyProperty ? colors.emerald + '33' : colors.surfaceLight }]}>
-                    <Text style={[styles.ownerEmoji, { color: colors.textPrimary }]}>{owner.avatar}</Text>
-                    <Text style={[styles.ownerName, { color: colors.textPrimary }]}>{owner.name}</Text>
-                  </View>
-                ) : (
-                  <View style={[styles.bankBadge, { backgroundColor: colors.gold + '22' }]}>
-                    <Text style={[styles.bankText, { color: colors.primary }]}>For Sale</Text>
-                  </View>
-                )}
-              </View>
+                  {owner ? (
+                    <View style={[styles.ownerBadge, { backgroundColor: isMyProperty ? colors.emerald + '44' : colors.surfaceLight }]}>
+                      <Text style={[styles.ownerEmoji, { color: colors.textPrimary }]}>{owner.avatar}</Text>
+                      <Text style={[styles.ownerName, { color: colors.textPrimary }]}>{owner.name}</Text>
+                    </View>
+                  ) : (
+                    <View style={[styles.bankBadge, { backgroundColor: colors.primary + '33' }]}>
+                      <Text style={[styles.bankText, { color: colors.primary }]}>For Sale</Text>
+                    </View>
+                  )}
+                </View>
+              </ImageBackground>
 
               {/* Price / Mortgage / Rent Row */}
               <View style={styles.infoRow}>
@@ -704,6 +713,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '800',
     color: COLORS.textPrimary,
+  },
+  deedHeaderBg: {
+    borderRadius: RADIUS.sm,
+    overflow: 'hidden',
+    marginBottom: SPACING.xs,
   },
   ownerBadge: {
     flexDirection: 'row',

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   StyleSheet, Text, View, ScrollView,
-  Modal, Pressable, ActivityIndicator, Alert,
+  Modal, Pressable, ActivityIndicator, Alert, ImageBackground,
 } from 'react-native';
 import { COLORS, RADIUS, SPACING } from '../../constants/theme';
 import { Button } from '../ui/Button';
@@ -12,6 +12,7 @@ import { BOARD_PROPERTIES, GROUP_COLORS } from '../../constants/boardRegistry';
 import { createTradeProposal } from '../../services/firebase/tradeService';
 import { soundEngine } from '../../services/sound/soundService';
 import { useThemeStore } from '../../store/useThemeStore';
+import { getTextureForGroup } from '../../constants/textures';
 
 interface TradeModalProps {
   visible: boolean;
@@ -200,6 +201,7 @@ export function TradeModal({
                         if (!deed) return null;
                         const isChecked = selectedOfferPropIds.includes(deed.id);
                         const groupColor = GROUP_COLORS[deed.group] || colors.primary;
+                        const textureSource = getTextureForGroup(deed.group);
 
                         return (
                           <Pressable
@@ -211,9 +213,15 @@ export function TradeModal({
                             ]}
                             onPress={() => toggleOfferProp(deed.id)}
                           >
-                            <Text style={[styles.deedChipText, { color: colors.textPrimary }]}>
-                              {isChecked ? '[SELECTED] ' : ''}{deed.name} (${deed.purchasePrice})
-                            </Text>
+                            <ImageBackground
+                              source={textureSource}
+                              style={styles.chipTextureBg}
+                              imageStyle={{ borderRadius: RADIUS.sm, opacity: 0.3 }}
+                            >
+                              <Text style={[styles.deedChipText, { color: colors.textPrimary }]}>
+                                {isChecked ? '[SELECTED] ' : ''}{deed.name} (${deed.purchasePrice})
+                              </Text>
+                            </ImageBackground>
                           </Pressable>
                         );
                       })}
@@ -244,6 +252,7 @@ export function TradeModal({
                         if (!deed) return null;
                         const isChecked = selectedRequestPropIds.includes(deed.id);
                         const groupColor = GROUP_COLORS[deed.group] || colors.primary;
+                        const textureSource = getTextureForGroup(deed.group);
 
                         return (
                           <Pressable
@@ -255,9 +264,15 @@ export function TradeModal({
                             ]}
                             onPress={() => toggleRequestProp(deed.id)}
                           >
-                            <Text style={[styles.deedChipText, { color: colors.textPrimary }]}>
-                              {isChecked ? '[SELECTED] ' : ''}{deed.name} (${deed.purchasePrice})
-                            </Text>
+                            <ImageBackground
+                              source={textureSource}
+                              style={styles.chipTextureBg}
+                              imageStyle={{ borderRadius: RADIUS.sm, opacity: 0.3 }}
+                            >
+                              <Text style={[styles.deedChipText, { color: colors.textPrimary }]}>
+                                {isChecked ? '[SELECTED] ' : ''}{deed.name} (${deed.purchasePrice})
+                              </Text>
+                            </ImageBackground>
                           </Pressable>
                         );
                       })}
@@ -420,12 +435,16 @@ const styles = StyleSheet.create({
   },
   deedChip: {
     backgroundColor: COLORS.surface,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs + 2,
     borderRadius: RADIUS.sm,
     borderLeftWidth: 4,
     borderWidth: 1,
     borderColor: COLORS.surfaceBorder,
+    overflow: 'hidden',
+  },
+  chipTextureBg: {
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs + 2,
+    borderRadius: RADIUS.sm,
   },
   deedChipChecked: {
     backgroundColor: COLORS.emerald + '22',
