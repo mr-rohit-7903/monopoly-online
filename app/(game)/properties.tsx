@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  StyleSheet, Text, View, ScrollView,
+  StyleSheet, Text, View, ScrollView, FlatList,
   Pressable, Platform, ActivityIndicator, Modal, ImageBackground, Alert,
 } from 'react-native';
 import { BOARD_PROPERTIES, GROUP_COLORS } from '../../src/constants/boardRegistry';
@@ -265,8 +265,15 @@ export default function PropertiesScreen() {
       </View>
 
       {/* Property Cards List */}
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {filteredDeeds.map((deed) => {
+      <FlatList
+        data={filteredDeeds}
+        keyExtractor={(deed) => deed.id}
+        contentContainerStyle={styles.scrollContent}
+        initialNumToRender={5}
+        maxToRenderPerBatch={5}
+        windowSize={5}
+        removeClippedSubviews={true}
+        renderItem={({ item: deed }) => {
           const pState: PropertyState = properties[deed.id] ?? {
             propertyId: deed.id,
             ownerId: '',
@@ -308,7 +315,6 @@ export default function PropertiesScreen() {
 
           return (
             <View
-              key={deed.id}
               style={[
                 styles.deedCard,
                 { backgroundColor: colors.surface, borderColor: colors.surfaceBorder },
@@ -640,8 +646,8 @@ export default function PropertiesScreen() {
           </ImageBackground>
         </View>
           );
-        })}
-      </ScrollView>
+        }}
+      />
 
       {/* ─── CUSTOM ACTION CONFIRMATION MODAL ─── */}
       {activeModal && (
