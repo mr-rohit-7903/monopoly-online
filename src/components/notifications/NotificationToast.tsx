@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { StyleSheet, Text, View, Pressable } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
   withTiming,
+  runOnJS,
 } from 'react-native-reanimated';
 import { useNotificationStore } from '../../store/useNotificationStore';
 import { COLORS, RADIUS, SPACING } from '../../constants/theme';
@@ -16,21 +17,42 @@ export const NotificationToast: React.FC = () => {
   const { colors } = useThemeStore();
   const translateY = useSharedValue(-120);
   const opacity = useSharedValue(0);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Stable reference for the JS-thread hide function (called from Reanimated UI thread)
+  const dismissToast = useCallback(() => {
+    hideToast();
+  }, [hideToast]);
 
   useEffect(() => {
     if (activeToast) {
+      // Clear any pending dismiss timer from a previous toast
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+
       soundEngine.playAlertSound();
       translateY.value = withSpring(0, { damping: 15, stiffness: 120 });
       opacity.value = withTiming(1, { duration: 250 });
 
-      const timer = setTimeout(() => {
+      timerRef.current = setTimeout(() => {
         translateY.value = withTiming(-120, { duration: 300 });
         opacity.value = withTiming(0, { duration: 300 }, () => {
-          hideToast();
+          // CRITICAL: hideToast is a Zustand setter that must run on the JS thread.
+          // Reanimated withTiming callbacks execute on the UI thread — calling JS
+          // functions directly from here causes a native crash. runOnJS marshals
+          // the call back to the JS thread safely.
+          runOnJS(dismissToast)();
         });
       }, 3500);
 
-      return () => clearTimeout(timer);
+      return () => {
+        if (timerRef.current) {
+          clearTimeout(timerRef.current);
+          timerRef.current = null;
+        }
+      };
     } else {
       translateY.value = -120;
       opacity.value = 0;
